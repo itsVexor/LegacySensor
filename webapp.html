@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111116"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Legacy Sensor">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="assets/icons/LegacySensor-180.png"><link rel="icon" href="assets/icons/favicon.png">
+<title>Legacy Sensor — Web App iOS v1.5.0 BETA</title>
+<style>
+:root{--bg:#101014;--card:#19191f;--card2:#202027;--pink:#ff4fa3;--green:#5cff79;--yellow:#ffd84a;--muted:#9e98a6;--line:rgba(255,255,255,.08)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#29202b 0,#101014 42%);color:#fff;font:15px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{width:min(760px,100%);margin:auto;padding:14px 14px calc(28px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;gap:12px;padding:8px 4px 14px}.logo{width:48px;height:48px;border-radius:14px;object-fit:contain;background:#fff}.brand{flex:1;text-align:left}.brand b{font-size:18px}.brand small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.back{background:#23232a;border:1px solid var(--line);color:#fff;border-radius:13px;padding:11px 13px;font-weight:900}.hero,.panel{background:rgba(25,25,31,.94);border:1px solid var(--line);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.22)}.hero{padding:15px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:14px;padding:13px 16px;font-weight:900;font-size:14px}.primary{background:#fff;color:#17151a}.secondary{background:#28282f;color:#fff;border:1px solid var(--line)}.status{margin-top:10px;padding:11px 13px;border-radius:13px;background:#211f22;color:#d8d2dc}.status.ok{color:#75f58b}.status.bad{color:#ff9a9a}.stage{position:relative;margin-top:12px;overflow:hidden;border-radius:22px;background:#050507;aspect-ratio:4/3;border:1px solid var(--line)}video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.badge{position:absolute;z-index:3;left:12px;top:12px;padding:8px 11px;border-radius:999px;background:rgba(12,12,15,.78);backdrop-filter:blur(8px);font-weight:900}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#777;margin-right:7px}.live .dot{background:var(--green)}.panel{margin-top:12px;padding:12px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:#202027;border-radius:15px;padding:12px 10px;text-align:left}.stat b{display:block;font-size:22px}.stat span{display:block;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.7px;margin-top:2px}.bar{height:7px;border-radius:99px;background:#2a2930;overflow:hidden;margin-top:8px}.fill{height:100%;width:0;background:var(--green);border-radius:99px}.hint{color:var(--muted);font-size:12px;line-height:1.45;margin:10px 2px}.beta{color:var(--pink);font-weight:950;letter-spacing:1px}.foot{text-align:center;color:#77727d;font-size:11px;margin-top:13px}@media(max-width:560px){main{padding-left:10px;padding-right:10px}.grid{grid-template-columns:repeat(2,1fr)}.back{padding:10px}.brand b{font-size:16px}}
+
+/* ---------- Onboarding: Add to Home Screen ---------- */
+.overlay-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:#0a0a18;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:center}
+.overlay-screen.hidden{display:none}
+.overlay-screen::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(1.5px 1.5px at 15% 22%,rgba(255,255,255,.9),transparent),
+    radial-gradient(1.5px 1.5px at 82% 15%,rgba(255,255,255,.7),transparent),
+    radial-gradient(1px 1px at 44% 8%,rgba(255,255,255,.8),transparent),
+    radial-gradient(1.5px 1.5px at 68% 34%,rgba(255,255,255,.6),transparent),
+    radial-gradient(1px 1px at 8% 48%,rgba(255,255,255,.7),transparent),
+    radial-gradient(1.5px 1.5px at 92% 55%,rgba(255,255,255,.6),transparent),
+    radial-gradient(1px 1px at 30% 65%,rgba(255,255,255,.5),transparent),
+    radial-gradient(1.5px 1.5px at 58% 78%,rgba(255,255,255,.6),transparent),
+    radial-gradient(1px 1px at 20% 88%,rgba(255,255,255,.5),transparent),
+    radial-gradient(1.5px 1.5px at 76% 92%,rgba(255,255,255,.5),transparent),
+    radial-gradient(circle at 50% 0%,#241a3d 0%,#140f28 38%,#0a0a18 72%)}
+.onboard-hero{position:relative;z-index:1;padding:46px 24px 8px;width:100%;max-width:460px}
+.onboard-logo{width:118px;height:118px;object-fit:contain;border-radius:30px;filter:drop-shadow(0 0 26px rgba(255,79,163,.35)) drop-shadow(0 12px 22px rgba(0,0,0,.5))}
+.onboard-hero h1{font-size:25px;margin:22px 0 10px;letter-spacing:.2px;color:var(--green);text-shadow:0 0 18px rgba(92,255,121,.55),0 0 40px rgba(92,255,121,.25)}
+.onboard-hero p{color:#c9c3d6;font-size:14px;line-height:1.6;max-width:340px;margin:0 auto}
+.onboard-coach{display:block;margin:22px auto 4px;height:190px;object-fit:contain;filter:drop-shadow(0 14px 22px rgba(0,0,0,.5))}
+.onboard-card{position:relative;z-index:1;width:100%;max-width:460px;padding:22px 22px calc(28px + env(safe-area-inset-bottom))}
+.onboard-steps{display:flex;flex-direction:column;gap:13px;margin:6px 0 22px}
+.onboard-step{display:flex;align-items:center;gap:14px;text-align:left;background:rgba(255,255,255,.03);border:1px solid rgba(92,255,121,.28);border-radius:18px;padding:15px 16px;box-shadow:0 0 0 1px rgba(0,0,0,.2) inset}
+.onboard-step .num{flex:0 0 32px;width:32px;height:32px;border-radius:11px;background:rgba(92,255,121,.14);border:1px solid rgba(92,255,121,.4);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--green)}
+.onboard-step .icon{flex:0 0 32px;width:32px;height:32px;border-radius:11px;background:rgba(92,255,121,.14);border:1px solid rgba(92,255,121,.4);display:flex;align-items:center;justify-content:center;font-size:16px}
+.onboard-step div.copy{padding-top:1px}
+.onboard-step b{display:block;font-size:14.5px;color:#fff}
+.onboard-step span{display:block;color:#9891a8;font-size:12px;margin-top:2px;line-height:1.4}
+.onboard-btn{width:100%;border:0;border-radius:999px;padding:17px;font-weight:900;font-size:15px;letter-spacing:.3px;background:linear-gradient(120deg,var(--green),#4fd8ff);color:#0a1c12;box-shadow:0 0 28px rgba(92,255,121,.35),0 10px 24px rgba(0,0,0,.35)}
+.onboard-skip{display:block;width:100%;text-align:center;background:none;border:0;color:#7a7488;font-weight:700;font-size:12.5px;margin-top:14px;padding:6px}
+
+/* ---------- Session search ---------- */
+.search-screen .onboard-hero{padding-bottom:6px}
+.search-status-ring{position:relative;width:150px;height:150px;margin:18px auto 6px;z-index:1}
+.search-status-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.search-status-ring circle{fill:none;stroke-width:5}
+.search-status-ring .track{stroke:rgba(255,255,255,.08)}
+.search-status-ring .fill{stroke:var(--green);stroke-linecap:round;stroke-dasharray:264;stroke-dashoffset:264;transition:stroke-dashoffset .3s ease;filter:drop-shadow(0 0 6px rgba(92,255,121,.7))}
+.search-status-ring img{position:absolute;inset:0;margin:auto;width:96px;height:96px;object-fit:contain;border-radius:26px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
+.search-list{display:flex;flex-direction:column;gap:11px;margin:4px 0 18px;max-height:44vh;overflow-y:auto}
+.session-row{display:flex;align-items:center;gap:13px;width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(92,255,121,.28);border-radius:18px;padding:15px 16px;text-align:left;color:#fff}
+.session-row .dot-ring{flex:0 0 10px;width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 10px 2px rgba(92,255,121,.55)}
+.session-row .copy{flex:1;min-width:0}
+.session-row b{display:block;font-size:14.5px}
+.session-row span{display:block;color:#9891a8;font-size:11.5px;margin-top:1px;font-family:ui-monospace,Menlo,monospace}
+.session-row .go{flex:0 0 auto;color:var(--green);font-weight:900;font-size:19px}
+.search-empty{text-align:center;color:#9891a8;font-size:13px;line-height:1.6;padding:16px 6px}
+.search-manual{margin-top:8px}
+.search-manual summary{color:#9891a8;font-size:12.5px;font-weight:700;text-align:center;list-style:none;cursor:pointer}
+.search-manual summary::-webkit-details-marker{display:none}
+.search-manual[open] summary{margin-bottom:10px}
+.manual-row{display:flex;gap:8px}
+.manual-row input{flex:1;min-width:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:13px 14px;color:#fff;font-size:14px}
+.manual-row button{flex:0 0 auto;border-radius:14px;padding:0 18px;font-weight:900;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.16)}
+
+@keyframes lsFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes lsPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.onboard-hero,.onboard-card{animation:lsFadeUp .5s cubic-bezier(.2,.8,.2,1) both}
+.onboard-card{animation-delay:.08s}
+.onboard-step{animation:lsFadeUp .45s cubic-bezier(.2,.8,.2,1) both}
+.onboard-step:nth-child(1){animation-delay:.1s}
+.onboard-step:nth-child(2){animation-delay:.18s}
+.onboard-step:nth-child(3){animation-delay:.26s}
+.session-row{animation:lsFadeUp .4s cubic-bezier(.2,.8,.2,1) both}
+.searching .search-status-ring img{animation:lsPulse 1.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.onboard-hero,.onboard-card,.onboard-step,.session-row,.searching .search-status-ring img{animation:none}}
+</style><script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script></head>
+<body>
+
+<!-- ============ Onboarding: Add to Home Screen ============ -->
+<div id="onboardScreen" class="overlay-screen hidden">
+  <div class="onboard-hero">
+    <img class="onboard-logo" src="assets/icons/LegacySensor-180.png" alt="Legacy Sensor" />
+    <h1>Install the Sensor</h1>
+    <p>Open this page in Safari and add it to the Home Screen to use your iPhone as a motion sensor.</p>
+    <img class="onboard-coach" src="assets/coaches/coachesLarge__HotToGo_Coach_1.png" alt="" aria-hidden="true" />
+  </div>
+  <div class="onboard-card">
+    <div class="onboard-steps">
+      <div class="onboard-step"><div class="num">1</div><div class="copy"><b>Tap the Share button</b><span>The square with an arrow, in Safari's toolbar.</span></div></div>
+      <div class="onboard-step"><div class="icon">&#8863;</div><div class="copy"><b>Choose &ldquo;Add to Home Screen&rdquo;</b><span>Scroll the share sheet if you don't see it right away.</span></div></div>
+      <div class="onboard-step"><div class="num">3</div><div class="copy"><b>Tap Add, then launch Legacy Sensor</b><span>It'll open full-screen from your Home Screen from now on.</span></div></div>
+    </div>
+    <button class="onboard-btn" id="onboardDone">I DID IT!</button>
+    <button class="onboard-skip" id="onboardSkip">Skip for now</button>
+  </div>
+</div>
+
+<!-- ============ Session search ============ -->
+<div id="searchScreen" class="overlay-screen hidden search-screen">
+  <div class="onboard-hero">
+    <img class="onboard-logo" src="assets/icons/LegacySensor-180.png" alt="Legacy Sensor" style="width:84px;height:84px" />
+    <h1 id="searchTitle" style="font-size:22px">Looking for your PC&hellip;</h1>
+    <p id="searchSubtitle">Make sure Legacy Sensor is running and your iPhone is on the same Wi-Fi.</p>
+    <div class="search-status-ring">
+      <svg viewBox="0 0 96 96"><circle class="track" cx="48" cy="48" r="42"/><circle id="searchRingFill" class="fill" cx="48" cy="48" r="42"/></svg>
+      <img src="assets/icons/LegacySensor-180.png" alt="" />
+    </div>
+  </div>
+  <div class="onboard-card">
+    <div id="searchList" class="search-list"></div>
+    <div id="searchEmpty" class="search-empty hidden">No PC found automatically yet.<br>Keep Legacy Sensor open on your PC, or connect manually below.</div>
+    <button class="onboard-btn" id="searchRetry">SEARCH AGAIN</button>
+    <details class="search-manual">
+      <summary>Connect manually with an IP address</summary>
+      <div class="manual-row">
+        <input id="manualIp" type="text" inputmode="decimal" placeholder="192.168.1.42" autocapitalize="off" autocorrect="off" />
+        <button class="btn secondary" id="manualGo">Connect</button>
+      </div>
+    </details>
+    <button class="onboard-skip" id="searchSkip">Skip &mdash; I'll connect from the app screen</button>
+  </div>
+</div>
+
+<main>
+<div class="top"><img class="logo" src="assets/icons/LegacySensor-180.png"><div class="brand"><b>Legacy Sensor</b><small>Phone Sensor · <span class="beta">v1.5.0 BETA</span></small></div><button class="back" id="back">← Back to Website</button></div>
+<section class="hero"><div class="actions"><button class="btn primary" id="start">START CAMERA</button><button class="btn secondary" id="pair">CONNECT PC</button></div><div id="status" class="status">Ready — start the camera first.</div><div class="stage"><video id="video" playsinline muted></video><canvas id="overlay"></canvas><div id="badge" class="badge"><span class="dot"></span>Tracking idle</div></div></section>
+<section class="panel"><div class="grid"><div class="stat"><b id="cfps">0</b><span>CAMERA FPS</span></div><div class="stat"><b id="pfps">0</b><span>POSE FPS</span></div><div class="stat"><b id="conf">0%</b><span>CONFIDENCE</span></div><div class="stat"><b id="perf">0%</b><span>PERFORMANCE</span></div></div><div class="bar"><div id="perfbar" class="fill"></div></div><p class="hint">Performance is calculated from pose FPS, confidence and frame latency. The camera and tracking stay on the iPhone; only body landmarks are sent to the PC.</p></section>
+<div class="foot">Legacy Sensor by ItsVexor · Web App iOS · v1.5.0 BETA</div>
+</main><script>
+const video=document.getElementById('video'),canvas=document.getElementById('overlay'),ctx=canvas.getContext('2d');
+const statusEl=document.getElementById('status'),badge=document.getElementById('badge');let stream,pose,ws,postMode=false,poseBusy=false,poseCount=0,poseT=performance.now(),frames=0,frameT=performance.now(),videoFramesLast=0,videoTimeLast=performance.now(),latency=0;
+const EDGES=[[0,1],[1,2],[2,3],[2,4],[4,5],[5,6],[6,7],[2,8],[8,9],[9,10],[10,11],[0,12],[12,13],[13,14],[14,15],[0,16],[16,17],[17,18],[18,19]];
+function kinectPts(l){const avg=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2,c:Math.min(a.c,b.c)}),lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,c:Math.min(a.c,b.c)}),p=i=>({x:l[i].x,y:l[i].y,c:Math.min(l[i].visibility??1,l[i].presence??1)}),hip=avg(p(23),p(24)),sh=avg(p(11),p(12)),ear=avg(p(7),p(8));return [hip,lerp(hip,sh,.52),sh,avg(ear,p(0)),p(11),p(13),p(15),p(19),p(12),p(14),p(16),p(20),p(23),p(25),p(27),p(31),p(24),p(26),p(28),p(32)];}
+const maskCanvas=document.createElement('canvas'),maskCtx=maskCanvas.getContext('2d'),outlineCanvas=document.createElement('canvas'),outlineCtx=outlineCanvas.getContext('2d');
+// Small 320x240 mask sent to the PC so Kinect10.dll can draw the player
+// silhouette in the game's camera preview. This is separate from the
+// larger maskCanvas/outlineCanvas above, which only draw the on-phone
+// yellow outline preview and are not sent anywhere.
+const SEND_MASK_W=320,SEND_MASK_H=240;
+const sendMaskCanvas=document.createElement('canvas');
+sendMaskCanvas.width=SEND_MASK_W;sendMaskCanvas.height=SEND_MASK_H;
+// The PC/Kinect preview needs the real mirrored camera frame as well as the body mask.
+// Keep this compact JPEG stream separate from the 320x240 silhouette mask.
+// NOTE: encoding a JPEG every pose frame (was ~20fps at 640x480) blocked the
+// main thread on iPhone and dragged pose tracking down to ~3fps. The camera
+// preview does not need to be nearly as fast as the pose stream, so this is
+// now decoupled: smaller resolution, much lower rate, and skipped entirely
+// while a previous encode/send is still in flight.
+const SEND_FRAME_W=480,SEND_FRAME_H=360;
+const sendFrameCanvas=document.createElement('canvas');
+sendFrameCanvas.width=SEND_FRAME_W;sendFrameCanvas.height=SEND_FRAME_H;
+const sendFrameCtx=sendFrameCanvas.getContext('2d',{alpha:false});
+let lastFrameEncodedAt=0,lastFrameB64=null,frameEncodeBusy=false;
+const FRAME_SEND_INTERVAL_MS=200; // ~5fps camera preview - plenty for a background/PC preview
+const sendMaskCtx=sendMaskCanvas.getContext('2d',{willReadFrequently:true});
+function segmentationMaskToBase64(seg){
+    if(!seg)return null;
+    sendMaskCtx.clearRect(0,0,SEND_MASK_W,SEND_MASK_H);
+    sendMaskCtx.drawImage(seg,0,0,SEND_MASK_W,SEND_MASK_H);
+    const img=sendMaskCtx.getImageData(0,0,SEND_MASK_W,SEND_MASK_H).data;
+    // Kinect10.dll only needs a single 0-255 value per pixel (player vs not),
+    // so pack the mask alpha channel into one byte per pixel instead of
+    // sending a 4-byte-per-pixel PNG - this keeps the phone->PC payload small.
+    const packed=new Uint8Array(SEND_MASK_W*SEND_MASK_H);
+    for(let i=0;i<packed.length;i++)packed[i]=img[i*4+3];
+    let binary='';
+    for(let i=0;i<packed.length;i++)binary+=String.fromCharCode(packed[i]);
+    return btoa(binary);
+}
+// Returns the last-encoded frame immediately (non-blocking) and kicks off a
+// new background encode if the interval has elapsed and no encode is
+// already in flight. This means onResults() never waits on JPEG encoding,
+// so pose tracking speed is unaffected by the camera preview.
+function maybeQueueCameraFrame(){
+    if(!video.videoWidth||!video.videoHeight)return;
+    const now=performance.now();
+    if(frameEncodeBusy||now-lastFrameEncodedAt<FRAME_SEND_INTERVAL_MS)return;
+    frameEncodeBusy=true;
+    lastFrameEncodedAt=now;
+    // Defer the actual encode to the next microtask/frame so it never runs
+    // synchronously inside the hot onResults() path.
+    requestAnimationFrame(()=>{
+        try{
+            sendFrameCtx.save();
+            sendFrameCtx.setTransform(-1,0,0,1,SEND_FRAME_W,0);
+            sendFrameCtx.drawImage(video,0,0,SEND_FRAME_W,SEND_FRAME_H);
+            sendFrameCtx.restore();
+            sendFrameCanvas.toBlob(blob=>{
+                if(blob){
+                    const reader=new FileReader();
+                    reader.onload=()=>{lastFrameB64=reader.result.split(',')[1];frameEncodeBusy=false};
+                    reader.onerror=()=>{frameEncodeBusy=false};
+                    reader.readAsDataURL(blob);
+                }else{frameEncodeBusy=false}
+            },'image/jpeg',0.6);
+        }catch(e){frameEncodeBusy=false}
+    });
+}
+function drawOutline(mask){if(!mask||!canvas.width)return;const w=canvas.width,h=canvas.height;if(maskCanvas.width!==w||maskCanvas.height!==h){maskCanvas.width=w;maskCanvas.height=h;outlineCanvas.width=w;outlineCanvas.height=h}maskCtx.clearRect(0,0,w,h);maskCtx.drawImage(mask,0,0,w,h);outlineCtx.clearRect(0,0,w,h);const r=Math.max(3,Math.round(Math.min(w,h)/170));for(let y=-r;y<=r;y+=2)for(let x=-r;x<=r;x+=2)if(x*x+y*y<=r*r)outlineCtx.drawImage(maskCanvas,x,y,w,h);outlineCtx.globalCompositeOperation='destination-out';outlineCtx.drawImage(maskCanvas,0,0,w,h);outlineCtx.globalCompositeOperation='source-in';outlineCtx.fillStyle='#ffd84a';outlineCtx.fillRect(0,0,w,h);outlineCtx.globalCompositeOperation='source-over';ctx.drawImage(outlineCanvas,0,0,w,h)}
+function draw(l,seg){ctx.clearRect(0,0,canvas.width,canvas.height);if(seg)drawOutline(seg);if(!l)return;const p=kinectPts(l);ctx.lineWidth=Math.max(4,canvas.width/180);ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#5cff79';ctx.fillStyle='#fff';for(const [a,b] of EDGES)if(p[a].c>.2&&p[b].c>.2){ctx.beginPath();ctx.moveTo(p[a].x*canvas.width,p[a].y*canvas.height);ctx.lineTo(p[b].x*canvas.width,p[b].y*canvas.height);ctx.stroke()}for(const q of p)if(q.c>.2){ctx.beginPath();ctx.arc(q.x*canvas.width,q.y*canvas.height,6,0,Math.PI*2);ctx.fill()}}
+function setStatus(t,ok=false){statusEl.textContent=t;statusEl.className='status '+(ok?'ok':'bad')}
+let postBusy=false,lastHttpOk=0,lastPoseAck=0,lastSent=0,inFlight=0,seqCounter=0;
+const MAX_INFLIGHT=4; // allow several overlapping HTTP requests instead
+                       // of waiting a full network round-trip per frame -
+                       // this is what actually caused the choppy in-game
+                       // silhouette on an average Wi-Fi connection (each
+                       // frame previously had to wait for the PC's response
+                       // before the next frame could even be sent). Measured
+                       // with a simulated 190ms round-trip (matching the
+                       // observed ~5 FPS bottleneck): 2 in-flight ~= 2x FPS,
+                       // 4 in-flight ~= 4x FPS. Kept modest to avoid frames
+                       // arriving out of order on a congested connection.
+function bridgeInfo(){const p=new URLSearchParams(location.search);return {host:p.get('bridge')||location.hostname,httpPort:p.get('httpPort')||'8766',wsPort:p.get('bridgePort')||'8765'};}
+function bridgeBase(){const info=bridgeInfo();const pageHost=location.hostname;const pagePort=location.port;/* If opened from the PC QR, use the exact page origin so Safari does not need a second certificate trust. */if(pageHost===info.host&&pagePort===info.httpPort)return location.origin;return `https://${info.host}:${info.httpPort}`}
+async function postPose(payload){if(inFlight>=MAX_INFLIGHT)return;inFlight++;try{const r=await fetch(bridgeBase()+'/pose',{method:'POST',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(payload),cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j.ok)throw new Error(j.error||'pose rejected');lastPoseAck=performance.now();postMode=true;setStatus('PC bridge: connected • receiving pose',true)}catch(e){postMode=false;setStatus('PC bridge: '+e.message)}finally{inFlight--}}
+async function sendPose(payload){if(ws&&ws.readyState===1){try{ws.send(JSON.stringify(payload));return}catch(e){try{ws.close()}catch(_){}}}const now=performance.now();if(now-lastSent<16)return;lastSent=now;postPose(payload)}
+async function connect(){const info=bridgeInfo();setStatus('Connecting to PC bridge…');postMode=false;try{const base=bridgeBase();const r=await fetch(base+'/ping?ts='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j.ok)throw new Error('bridge rejected connection');postMode=true;setStatus('PC bridge: ready • start camera / sending pose',true);try{localStorage.setItem('ls_last_pc_ip',info.host)}catch(_){}/* Send an immediate handshake so PC can confirm the phone without waiting for the next UI cycle. */if(pose&&video.readyState>=2){try{await pose.send({image:video})}catch(_){}}return}catch(e){console.warn('PC HTTPS bridge failed',e)}try{ws=new WebSocket(`wss://${info.host}:${info.wsPort}`);await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('WSS timeout')),2200);ws.onopen=()=>{clearTimeout(timer);resolve()};ws.onerror=()=>{clearTimeout(timer);reject(new Error('WSS failed'))}});setStatus('PC bridge: connected • low-latency WSS',true);try{localStorage.setItem('ls_last_pc_ip',info.host)}catch(_){}return}catch(e){console.warn('WSS bridge failed',e)}setStatus('PC bridge: unavailable — scan the QR from the PC and accept its certificate',false)}
+async function onResults(r){if(!canvas.width||canvas.width!==video.videoWidth){canvas.width=video.videoWidth;canvas.height=video.videoHeight}const l=r.poseLandmarks;if(!l){badge.innerHTML='<span class="dot"></span>Tracking lost';return}draw(l,r.segmentationMask);
+// Pose/world/norm landmarks are sent RAW (no horizontal flip). The
+// confirmed fix for mirrored in-game silhouette / unresponsive Coach
+// Selection is applied once, in phone_sensor_module.py, to the mask only -
+// see _flip_mask_horizontal(). Flipping the skeleton here as well was
+// tried and did not fix Coach Selection (Kinect10.dll normalizes all
+// joints relative to the hip, which cancels out any uniform offset before
+// it reaches the game), so scoring geometry stays exactly as MediaPipe
+// reports it.
+const world=(r.poseWorldLandmarks||[]).map(q=>[q.x,q.y,q.z]),norm=l.map(q=>({x:q.x,y:q.y,visibility:q.visibility??1,presence:q.presence??1}));const now=performance.now();poseCount++;frames++;latency=performance.now()-now; if(now-poseT>=1000){const pf=Math.round(poseCount*1000/(now-poseT));document.getElementById('pfps').textContent=pf;poseCount=0;poseT=now}const conf=Math.round(norm.reduce((s,q)=>s+Math.min(q.visibility,q.presence),0)/norm.length*100);document.getElementById('conf').textContent=conf+'%';badge.innerHTML='<span class="dot"></span>Tracking live';const mask=segmentationMaskToBase64(r.segmentationMask);if(world.length===33)sendPose({type:'pose',seq:++seqCounter,world,norm,mask,maskW:SEND_MASK_W,maskH:SEND_MASK_H})}
+async function start(){if(stream)return;stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}},audio:false});video.srcObject=stream;await video.play();pose=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/${f}`});pose.setOptions({modelComplexity:1,smoothLandmarks:true,enableSegmentation:true,smoothSegmentation:true,minDetectionConfidence:.55,minTrackingConfidence:.55});pose.onResults(onResults);async function loop(){if(video.readyState>=2&&!poseBusy){poseBusy=true;try{await pose.send({image:video})}catch(e){console.warn('pose.send',e)}finally{poseBusy=false}}requestAnimationFrame(loop)}loop();setStatus('Camera live • ready to connect to PC',true);badge.innerHTML='<span class="dot"></span>Tracking live'}
+document.getElementById('start').onclick=()=>start().catch(e=>{console.error(e);setStatus('Camera error: '+(e?.message||e),false)});document.getElementById('pair').onclick=()=>connect().catch(e=>{console.error(e);setStatus('PC error: '+(e?.message||e),false)});
+document.getElementById('back').onclick=()=>{try{stream?.getTracks().forEach(t=>t.stop())}catch(e){};const p=new URLSearchParams(location.search);const ret=p.get('return')||'https://legacysensorby-its-vexor.netlify.app/';try{window.top.location.replace(ret)}catch(e){window.location.replace(ret)}};
+setInterval(async()=>{if(postMode){try{const r=await fetch(bridgeBase()+'/status',{cache:'no-store'});if(!r.ok)throw 0;const j=await r.json();if(!j.ok||!j.connected){setStatus('PC bridge: ready • waiting for pose',true)}}catch(e){postMode=false;setStatus('PC bridge: connection lost')}}},1500);
+// ================= Onboarding + Session Search =================
+// This block only decides WHICH screen is visible and, for search, which
+// IP goes into the URL/localStorage before the existing connect()/postPose()
+// code runs - it does not change any tracking or networking logic above.
+(function(){
+    const ONBOARD_KEY='ls_onboard_seen_v1';
+    const IP_KEY='ls_last_pc_ip';
+    const onboardScreen=document.getElementById('onboardScreen');
+    const searchScreen=document.getElementById('searchScreen');
+    const mainEl=document.querySelector('main');
+    const params=new URLSearchParams(location.search);
+    const isStandalone=window.navigator.standalone===true || window.matchMedia('(display-mode: standalone)').matches;
+    const hasExplicitBridge=params.has('bridge');
+
+    function showOnly(el){
+        [onboardScreen,searchScreen].forEach(s=>s.classList.add('hidden'));
+        mainEl.style.display='none';
+        if(el){el.classList.remove('hidden')}else{mainEl.style.display=''}
+    }
+
+    // ---- Step 1: onboarding (Safari, not installed yet, first visit only) ----
+    function isIOSSafari(){
+        const ua=navigator.userAgent;
+        const iOS=/iP(hone|od|ad)/.test(ua);
+        const webkit=/WebKit/.test(ua);
+        const notChromeOrFF=!/CriOS|FxiOS|EdgiOS/.test(ua);
+        return iOS && webkit && notChromeOrFF;
+    }
+    const needsOnboarding=isIOSSafari() && !isStandalone && !localStorage.getItem(ONBOARD_KEY) && !hasExplicitBridge;
+
+    document.getElementById('onboardDone').onclick=()=>{localStorage.setItem(ONBOARD_KEY,'1');afterOnboarding()};
+    document.getElementById('onboardSkip').onclick=()=>{localStorage.setItem(ONBOARD_KEY,'1');afterOnboarding()};
+
+    function afterOnboarding(){
+        if(hasExplicitBridge){showOnly(null);return} // came from the PC's QR - go straight to the app
+        startSearch();
+    }
+
+    // ---- Step 2: session search ----
+    const RING_CIRC=264;
+    const ringFill=document.getElementById('searchRingFill');
+    const listEl=document.getElementById('searchList');
+    const emptyEl=document.getElementById('searchEmpty');
+    const titleEl=document.getElementById('searchTitle');
+    const subtitleEl=document.getElementById('searchSubtitle');
+    let searchToken=0;
+
+    function setRing(fraction){ringFill.style.strokeDashoffset=String(RING_CIRC*(1-Math.max(0,Math.min(1,fraction))))}
+
+    async function probe(ip,timeoutMs){
+        const ctrl=new AbortController();
+        const timer=setTimeout(()=>ctrl.abort(),timeoutMs);
+        try{
+            const r=await fetch(`https://${ip}:8766/ping?ts=${Date.now()}`,{cache:'no-store',signal:ctrl.signal});
+            clearTimeout(timer);
+            if(!r.ok)return null;
+            const j=await r.json();
+            if(!j.ok)return null;
+            return {ip,name:j.name||'Legacy Sensor'};
+        }catch(e){clearTimeout(timer);return null}
+    }
+
+    function subnetFromIp(ip){const parts=ip.split('.');if(parts.length!==4)return null;return parts.slice(0,3).join('.')}
+
+    async function runSearch(){
+        const token=++searchToken;
+        searchScreen.classList.add('searching');
+        listEl.innerHTML='';
+        emptyEl.classList.add('hidden');
+        titleEl.textContent="Looking for your PC…";
+        subtitleEl.textContent='Make sure Legacy Sensor is running and your iPhone is on the same Wi-Fi.';
+        setRing(0);
+        const found=[];
+        const seen=new Set();
+        function addResult(res){
+            if(!res||seen.has(res.ip))return;
+            seen.add(res.ip);
+            found.push(res);
+            renderList(found);
+        }
+
+        // Try the remembered IP first - instant reconnect for the common case.
+        const lastIp=localStorage.getItem(IP_KEY);
+        if(lastIp){
+            const res=await probe(lastIp,1800);
+            if(token!==searchToken)return;
+            if(res){addResult(res);setRing(1);finishSearch(found);return}
+        }
+
+        // Fall back to scanning the common home-network range in the same
+        // /24 subnet as the remembered IP (or 192.168.1.x if we have none),
+        // run in parallel batches so this takes a few seconds, not minutes.
+        const baseSubnet=subnetFromIp(lastIp||'')||'192.168.1';
+        const candidates=[];
+        for(let i=2;i<255;i++)candidates.push(`${baseSubnet}.${i}`);
+        // Also try the second most common home range in case the phone's
+        // own address (not exposed to page JS) is on a different subnet.
+        if(baseSubnet!=='192.168.0'){for(let i=2;i<255;i++)candidates.push(`192.168.0.${i}`)}
+
+        const BATCH=24;
+        let completed=0;
+        for(let i=0;i<candidates.length;i+=BATCH){
+            if(token!==searchToken)return;
+            const batch=candidates.slice(i,i+BATCH);
+            const results=await Promise.all(batch.map(ip=>probe(ip,900)));
+            if(token!==searchToken)return;
+            results.forEach(addResult);
+            completed+=batch.length;
+            setRing(completed/candidates.length);
+            if(found.length>0 && i>=BATCH*3)break; // enough of a head start once we have hits
+        }
+        if(token!==searchToken)return;
+        finishSearch(found);
+    }
+
+    function finishSearch(found){
+        searchScreen.classList.remove('searching');
+        setRing(1);
+        if(found.length===0){
+            titleEl.textContent="Couldn't find a PC";
+            subtitleEl.textContent='Scan the QR code from Legacy Sensor on your PC, or connect manually below.';
+            emptyEl.classList.remove('hidden');
+        }else if(found.length===1){
+            useSession(found[0].ip);
+        }else{
+            titleEl.textContent='Found '+found.length+' sessions';
+            subtitleEl.textContent='Pick the PC you want to connect to.';
+        }
+    }
+
+    function renderList(found){
+        listEl.innerHTML=found.map(f=>`<button class="session-row" data-ip="${f.ip}"><span class="dot-ring"></span><span class="copy"><b>${f.name}</b><span>${f.ip}</span></span><span class="go">&rarr;</span></button>`).join('');
+        listEl.querySelectorAll('.session-row').forEach(row=>{row.onclick=()=>useSession(row.getAttribute('data-ip'))});
+    }
+
+    function useSession(ip){
+        localStorage.setItem(IP_KEY,ip);
+        const url=new URL(location.href);
+        url.searchParams.set('bridge',ip);
+        history.replaceState(null,'',url);
+        showOnly(null);
+    }
+
+    function startSearch(){
+        showOnly(searchScreen);
+        runSearch();
+    }
+
+    document.getElementById('searchRetry').onclick=()=>runSearch();
+    document.getElementById('searchSkip').onclick=()=>showOnly(null);
+    document.getElementById('manualGo').onclick=()=>{
+        const v=document.getElementById('manualIp').value.trim();
+        if(!v)return;
+        useSession(v);
+    };
+
+    // ---- Entry point ----
+    if(needsOnboarding){
+        showOnly(onboardScreen);
+    }else if(!hasExplicitBridge){
+        startSearch();
+    } // else: opened via the PC's QR with ?bridge=... already set - go straight in.
+})();
+</script></body></html>
