@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111116"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Legacy Sensor">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="assets/icons/LegacySensor-180.png"><link rel="icon" href="assets/icons/favicon.png">
+<title>Legacy Sensor — Web App iOS v1.5.0 BETA</title>
+<style>
+:root{--bg:#101014;--card:#19191f;--card2:#202027;--pink:#ff4fa3;--green:#5cff79;--yellow:#ffd84a;--muted:#9e98a6;--line:rgba(255,255,255,.08)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#29202b 0,#101014 42%);color:#fff;font:15px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{width:min(760px,100%);margin:auto;padding:14px 14px calc(28px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;gap:12px;padding:8px 4px 14px}.logo{width:48px;height:48px;border-radius:14px;object-fit:contain;background:#fff}.brand{flex:1;text-align:left}.brand b{font-size:18px}.brand small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.back{background:#23232a;border:1px solid var(--line);color:#fff;border-radius:13px;padding:11px 13px;font-weight:900}.hero,.panel{background:rgba(25,25,31,.94);border:1px solid var(--line);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.22)}.hero{padding:15px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:14px;padding:13px 16px;font-weight:900;font-size:14px}.primary{background:#fff;color:#17151a}.secondary{background:#28282f;color:#fff;border:1px solid var(--line)}.status{margin-top:10px;padding:11px 13px;border-radius:13px;background:#211f22;color:#d8d2dc}.status.ok{color:#75f58b}.status.bad{color:#ff9a9a}.stage{position:relative;margin-top:12px;overflow:hidden;border-radius:22px;background:#050507;aspect-ratio:4/3;border:1px solid var(--line)}video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.badge{position:absolute;z-index:3;left:12px;top:12px;padding:8px 11px;border-radius:999px;background:rgba(12,12,15,.78);backdrop-filter:blur(8px);font-weight:900}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#777;margin-right:7px}.live .dot{background:var(--green)}.panel{margin-top:12px;padding:12px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:#202027;border-radius:15px;padding:12px 10px;text-align:left}.stat b{display:block;font-size:22px}.stat span{display:block;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.7px;margin-top:2px}.bar{height:7px;border-radius:99px;background:#2a2930;overflow:hidden;margin-top:8px}.fill{height:100%;width:0;background:var(--green);border-radius:99px}.hint{color:var(--muted);font-size:12px;line-height:1.45;margin:10px 2px}.beta{color:var(--pink);font-weight:950;letter-spacing:1px}.foot{text-align:center;color:#77727d;font-size:11px;margin-top:13px}@media(max-width:560px){main{padding-left:10px;padding-right:10px}.grid{grid-template-columns:repeat(2,1fr)}.back{padding:10px}.brand b{font-size:16px}}
+</style><script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script></head>
+<body><main>
+<div class="top"><img class="logo" src="assets/icons/LegacySensor-180.png"><div class="brand"><b>Legacy Sensor</b><small>Phone Sensor · <span class="beta">v1.5.0 BETA</span></small></div><button class="back" id="back">← Back to Website</button></div>
+<section class="hero"><div class="actions"><button class="btn primary" id="start">START CAMERA</button><button class="btn secondary" id="pair">CONNECT PC</button></div><div id="status" class="status">Ready — start the camera first.</div><div class="stage"><video id="video" playsinline muted></video><canvas id="overlay"></canvas><div id="badge" class="badge"><span class="dot"></span>Tracking idle</div></div></section>
+<section class="panel"><div class="grid"><div class="stat"><b id="cfps">0</b><span>CAMERA FPS</span></div><div class="stat"><b id="pfps">0</b><span>POSE FPS</span></div><div class="stat"><b id="conf">0%</b><span>CONFIDENCE</span></div><div class="stat"><b id="perf">0%</b><span>PERFORMANCE</span></div></div><div class="bar"><div id="perfbar" class="fill"></div></div><p class="hint">Performance is calculated from pose FPS, confidence and frame latency. The camera and tracking stay on the iPhone; only body landmarks are sent to the PC.</p></section>
+<div class="foot">Legacy Sensor by ItsVexor · Web App iOS · v1.5.0 BETA</div>
+</main><script>
+const video=document.getElementById('video'),canvas=document.getElementById('overlay'),ctx=canvas.getContext('2d');
+const statusEl=document.getElementById('status'),badge=document.getElementById('badge');let stream,pose,ws,postMode=false,poseBusy=false,poseCount=0,poseT=performance.now(),frames=0,frameT=performance.now(),videoFramesLast=0,videoTimeLast=performance.now(),latency=0;
+const EDGES=[[0,1],[1,2],[2,3],[2,4],[4,5],[5,6],[6,7],[2,8],[8,9],[9,10],[10,11],[0,12],[12,13],[13,14],[14,15],[0,16],[16,17],[17,18],[18,19]];
+function kinectPts(l){const avg=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2,c:Math.min(a.c,b.c)}),lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,c:Math.min(a.c,b.c)}),p=i=>({x:l[i].x,y:l[i].y,c:Math.min(l[i].visibility??1,l[i].presence??1)}),hip=avg(p(23),p(24)),sh=avg(p(11),p(12)),ear=avg(p(7),p(8));return [hip,lerp(hip,sh,.52),sh,avg(ear,p(0)),p(11),p(13),p(15),p(19),p(12),p(14),p(16),p(20),p(23),p(25),p(27),p(31),p(24),p(26),p(28),p(32)];}
+const maskCanvas=document.createElement('canvas'),maskCtx=maskCanvas.getContext('2d'),outlineCanvas=document.createElement('canvas'),outlineCtx=outlineCanvas.getContext('2d');
+// Small 320x240 mask sent to the PC so Kinect10.dll can draw the player
+// silhouette in the game's camera preview. This is separate from the
+// larger maskCanvas/outlineCanvas above, which only draw the on-phone
+// yellow outline preview and are not sent anywhere.
+const SEND_MASK_W=320,SEND_MASK_H=240;
+const sendMaskCanvas=document.createElement('canvas');
+sendMaskCanvas.width=SEND_MASK_W;sendMaskCanvas.height=SEND_MASK_H;
+// The PC/Kinect preview needs the real mirrored camera frame as well as the body mask.
+// Keep this compact JPEG stream separate from the 320x240 silhouette mask.
+// NOTE: encoding a JPEG every pose frame (was ~20fps at 640x480) blocked the
+// main thread on iPhone and dragged pose tracking down to ~3fps. The camera
+// preview does not need to be nearly as fast as the pose stream, so this is
+// now decoupled: smaller resolution, much lower rate, and skipped entirely
+// while a previous encode/send is still in flight.
+const SEND_FRAME_W=480,SEND_FRAME_H=360;
+const sendFrameCanvas=document.createElement('canvas');
+sendFrameCanvas.width=SEND_FRAME_W;sendFrameCanvas.height=SEND_FRAME_H;
+const sendFrameCtx=sendFrameCanvas.getContext('2d',{alpha:false});
+let lastFrameEncodedAt=0,lastFrameB64=null,frameEncodeBusy=false;
+const FRAME_SEND_INTERVAL_MS=200; // ~5fps camera preview - plenty for a background/PC preview
+const sendMaskCtx=sendMaskCanvas.getContext('2d',{willReadFrequently:true});
+function segmentationMaskToBase64(seg){
+    if(!seg)return null;
+    sendMaskCtx.clearRect(0,0,SEND_MASK_W,SEND_MASK_H);
+    sendMaskCtx.drawImage(seg,0,0,SEND_MASK_W,SEND_MASK_H);
+    const img=sendMaskCtx.getImageData(0,0,SEND_MASK_W,SEND_MASK_H).data;
+    // Kinect10.dll only needs a single 0-255 value per pixel (player vs not),
+    // so pack the mask alpha channel into one byte per pixel instead of
+    // sending a 4-byte-per-pixel PNG - this keeps the phone->PC payload small.
+    const packed=new Uint8Array(SEND_MASK_W*SEND_MASK_H);
+    for(let i=0;i<packed.length;i++)packed[i]=img[i*4+3];
+    let binary='';
+    for(let i=0;i<packed.length;i++)binary+=String.fromCharCode(packed[i]);
+    return btoa(binary);
+}
+// Returns the last-encoded frame immediately (non-blocking) and kicks off a
+// new background encode if the interval has elapsed and no encode is
+// already in flight. This means onResults() never waits on JPEG encoding,
+// so pose tracking speed is unaffected by the camera preview.
+function maybeQueueCameraFrame(){
+    if(!video.videoWidth||!video.videoHeight)return;
+    const now=performance.now();
+    if(frameEncodeBusy||now-lastFrameEncodedAt<FRAME_SEND_INTERVAL_MS)return;
+    frameEncodeBusy=true;
+    lastFrameEncodedAt=now;
+    // Defer the actual encode to the next microtask/frame so it never runs
+    // synchronously inside the hot onResults() path.
+    requestAnimationFrame(()=>{
+        try{
+            sendFrameCtx.save();
+            sendFrameCtx.setTransform(-1,0,0,1,SEND_FRAME_W,0);
+            sendFrameCtx.drawImage(video,0,0,SEND_FRAME_W,SEND_FRAME_H);
+            sendFrameCtx.restore();
+            sendFrameCanvas.toBlob(blob=>{
+                if(blob){
+                    const reader=new FileReader();
+                    reader.onload=()=>{lastFrameB64=reader.result.split(',')[1];frameEncodeBusy=false};
+                    reader.onerror=()=>{frameEncodeBusy=false};
+                    reader.readAsDataURL(blob);
+                }else{frameEncodeBusy=false}
+            },'image/jpeg',0.6);
+        }catch(e){frameEncodeBusy=false}
+    });
+}
+function drawOutline(mask){if(!mask||!canvas.width)return;const w=canvas.width,h=canvas.height;if(maskCanvas.width!==w||maskCanvas.height!==h){maskCanvas.width=w;maskCanvas.height=h;outlineCanvas.width=w;outlineCanvas.height=h}maskCtx.clearRect(0,0,w,h);maskCtx.drawImage(mask,0,0,w,h);outlineCtx.clearRect(0,0,w,h);const r=Math.max(3,Math.round(Math.min(w,h)/170));for(let y=-r;y<=r;y+=2)for(let x=-r;x<=r;x+=2)if(x*x+y*y<=r*r)outlineCtx.drawImage(maskCanvas,x,y,w,h);outlineCtx.globalCompositeOperation='destination-out';outlineCtx.drawImage(maskCanvas,0,0,w,h);outlineCtx.globalCompositeOperation='source-in';outlineCtx.fillStyle='#ffd84a';outlineCtx.fillRect(0,0,w,h);outlineCtx.globalCompositeOperation='source-over';ctx.drawImage(outlineCanvas,0,0,w,h)}
+function draw(l,seg){ctx.clearRect(0,0,canvas.width,canvas.height);if(seg)drawOutline(seg);if(!l)return;const p=kinectPts(l);ctx.lineWidth=Math.max(4,canvas.width/180);ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#5cff79';ctx.fillStyle='#fff';for(const [a,b] of EDGES)if(p[a].c>.2&&p[b].c>.2){ctx.beginPath();ctx.moveTo(p[a].x*canvas.width,p[a].y*canvas.height);ctx.lineTo(p[b].x*canvas.width,p[b].y*canvas.height);ctx.stroke()}for(const q of p)if(q.c>.2){ctx.beginPath();ctx.arc(q.x*canvas.width,q.y*canvas.height,6,0,Math.PI*2);ctx.fill()}}
+function setStatus(t,ok=false){statusEl.textContent=t;statusEl.className='status '+(ok?'ok':'bad')}
+let postBusy=false,lastHttpOk=0,lastPoseAck=0,lastSent=0,inFlight=0,seqCounter=0;
+const MAX_INFLIGHT=4; // allow several overlapping HTTP requests instead
+                       // of waiting a full network round-trip per frame -
+                       // this is what actually caused the choppy in-game
+                       // silhouette on an average Wi-Fi connection (each
+                       // frame previously had to wait for the PC's response
+                       // before the next frame could even be sent). Measured
+                       // with a simulated 190ms round-trip (matching the
+                       // observed ~5 FPS bottleneck): 2 in-flight ~= 2x FPS,
+                       // 4 in-flight ~= 4x FPS. Kept modest to avoid frames
+                       // arriving out of order on a congested connection.
+function bridgeInfo(){const p=new URLSearchParams(location.search);return {host:p.get('bridge')||location.hostname,httpPort:p.get('httpPort')||'8766',wsPort:p.get('bridgePort')||'8765'};}
+function bridgeBase(){const info=bridgeInfo();const pageHost=location.hostname;const pagePort=location.port;/* If opened from the PC QR, use the exact page origin so Safari does not need a second certificate trust. */if(pageHost===info.host&&pagePort===info.httpPort)return location.origin;return `https://${info.host}:${info.httpPort}`}
+async function postPose(payload){if(inFlight>=MAX_INFLIGHT)return;inFlight++;try{const r=await fetch(bridgeBase()+'/pose',{method:'POST',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(payload),cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j.ok)throw new Error(j.error||'pose rejected');lastPoseAck=performance.now();postMode=true;setStatus('PC bridge: connected • receiving pose',true)}catch(e){postMode=false;setStatus('PC bridge: '+e.message)}finally{inFlight--}}
+async function sendPose(payload){if(ws&&ws.readyState===1){try{ws.send(JSON.stringify(payload));return}catch(e){try{ws.close()}catch(_){}}}const now=performance.now();if(now-lastSent<16)return;lastSent=now;postPose(payload)}
+async function connect(){const info=bridgeInfo();setStatus('Connecting to PC bridge…');postMode=false;try{const base=bridgeBase();const r=await fetch(base+'/ping?ts='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j.ok)throw new Error('bridge rejected connection');postMode=true;setStatus('PC bridge: ready • start camera / sending pose',true);/* Send an immediate handshake so PC can confirm the phone without waiting for the next UI cycle. */if(pose&&video.readyState>=2){try{await pose.send({image:video})}catch(_){}}return}catch(e){console.warn('PC HTTPS bridge failed',e)}try{ws=new WebSocket(`wss://${info.host}:${info.wsPort}`);await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('WSS timeout')),2200);ws.onopen=()=>{clearTimeout(timer);resolve()};ws.onerror=()=>{clearTimeout(timer);reject(new Error('WSS failed'))}});setStatus('PC bridge: connected • low-latency WSS',true);return}catch(e){console.warn('WSS bridge failed',e)}setStatus('PC bridge: unavailable — scan the QR from the PC and accept its certificate',false)}
+async function onResults(r){if(!canvas.width||canvas.width!==video.videoWidth){canvas.width=video.videoWidth;canvas.height=video.videoHeight}const l=r.poseLandmarks;if(!l){badge.innerHTML='<span class="dot"></span>Tracking lost';return}draw(l,r.segmentationMask);
+// Pose/world/norm landmarks are sent RAW (no horizontal flip). The
+// confirmed fix for mirrored in-game silhouette / unresponsive Coach
+// Selection is applied once, in phone_sensor_module.py, to the mask only -
+// see _flip_mask_horizontal(). Flipping the skeleton here as well was
+// tried and did not fix Coach Selection (Kinect10.dll normalizes all
+// joints relative to the hip, which cancels out any uniform offset before
+// it reaches the game), so scoring geometry stays exactly as MediaPipe
+// reports it.
+const world=(r.poseWorldLandmarks||[]).map(q=>[q.x,q.y,q.z]),norm=l.map(q=>({x:q.x,y:q.y,visibility:q.visibility??1,presence:q.presence??1}));const now=performance.now();poseCount++;frames++;latency=performance.now()-now; if(now-poseT>=1000){const pf=Math.round(poseCount*1000/(now-poseT));document.getElementById('pfps').textContent=pf;poseCount=0;poseT=now}const conf=Math.round(norm.reduce((s,q)=>s+Math.min(q.visibility,q.presence),0)/norm.length*100);document.getElementById('conf').textContent=conf+'%';badge.innerHTML='<span class="dot"></span>Tracking live';const mask=segmentationMaskToBase64(r.segmentationMask);if(world.length===33)sendPose({type:'pose',seq:++seqCounter,world,norm,mask,maskW:SEND_MASK_W,maskH:SEND_MASK_H})}
+async function start(){if(stream)return;stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}},audio:false});video.srcObject=stream;await video.play();pose=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/${f}`});pose.setOptions({modelComplexity:1,smoothLandmarks:true,enableSegmentation:true,smoothSegmentation:true,minDetectionConfidence:.55,minTrackingConfidence:.55});pose.onResults(onResults);async function loop(){if(video.readyState>=2&&!poseBusy){poseBusy=true;try{await pose.send({image:video})}catch(e){console.warn('pose.send',e)}finally{poseBusy=false}}requestAnimationFrame(loop)}loop();setStatus('Camera live • ready to connect to PC',true);badge.innerHTML='<span class="dot"></span>Tracking live'}
+document.getElementById('start').onclick=()=>start().catch(e=>{console.error(e);setStatus('Camera error: '+(e?.message||e),false)});document.getElementById('pair').onclick=()=>connect().catch(e=>{console.error(e);setStatus('PC error: '+(e?.message||e),false)});
+document.getElementById('back').onclick=()=>{try{stream?.getTracks().forEach(t=>t.stop())}catch(e){};const p=new URLSearchParams(location.search);const ret=p.get('return')||'https://legacysensorby-its-vexor.netlify.app/';try{window.top.location.replace(ret)}catch(e){window.location.replace(ret)}};
+setInterval(async()=>{if(postMode){try{const r=await fetch(bridgeBase()+'/status',{cache:'no-store'});if(!r.ok)throw 0;const j=await r.json();if(!j.ok||!j.connected){setStatus('PC bridge: ready • waiting for pose',true)}}catch(e){postMode=false;setStatus('PC bridge: connection lost')}}},1500);
+setInterval(()=>{let cf=0;if(video.readyState>=2){const q=video.getVideoPlaybackQuality?.();const total=q?.totalVideoFrames??0;const now=performance.now();if(total>videoFramesLast)cf=Math.round((total-videoFramesLast)*1000/Math.max(1,now-videoTimeLast));videoFramesLast=total;videoTimeLast=now;document.getElementById('cfps').textContent=cf||0}const pf=parseFloat(document.getElementById('pfps').textContent)||0,c=parseFloat(document.getElementById('conf').textContent)||0;const score=Math.max(0,Math.min(100,Math.round(Math.min(pf/30,1)*45+c*.55)));document.getElementById('perf').textContent=score+'%';document.getElementById('perfbar').style.width=score+'%'},1000);
+</script></body></html>
