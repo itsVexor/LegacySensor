@@ -1,0 +1,123 @@
+/* Legacy Sensor - seasonal events (Halloween Oct 1-31, Christmas Dec 1-31).
+   Everything here is inert unless seasonal.js adds html.ls-on. Only opacity/transform are animated
+   (GPU compositor), nothing here can block camera, tracking or layout. */
+
+/* ---------- background layer (WebApp) ---------- */
+#ls-bg{position:fixed;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;display:none;
+  background-color:#1a1060;background-size:cover;background-position:center;background-repeat:no-repeat;
+  opacity:0;transition:opacity 1.4s ease}
+#ls-bg::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;
+  background:linear-gradient(180deg,rgba(6,4,22,.34) 0,rgba(6,4,22,.06) 34%,rgba(6,4,22,.38) 100%)}
+html.ls-on.ls-app #ls-bg{display:block}
+html.ls-on.ls-app.ls-show #ls-bg{opacity:1}
+html.ls-on.ls-app,html.ls-on.ls-app body{background:transparent}
+html.ls-on.ls-app.ls-halloween{background-color:#160d4e}
+html.ls-on.ls-app.ls-christmas{background-color:#2b0008}
+html.ls-halloween #ls-bg{background-image:var(--ls-bg-land)}
+html.ls-christmas #ls-bg{background-image:var(--ls-bg-land)}
+@media (max-aspect-ratio:1/1){
+  html.ls-halloween #ls-bg,html.ls-christmas #ls-bg{background-image:var(--ls-bg-port)}
+}
+/* text that sits directly on the picture (not inside a white card) */
+html.ls-on.ls-app .top .brand b{color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.55)}
+html.ls-on.ls-app .top .brand small{color:rgba(255,255,255,.86);text-shadow:0 1px 8px rgba(0,0,0,.5)}
+html.ls-on.ls-app .top .brand .beta{color:#ffc4ea}
+html.ls-on.ls-app main>.hint,html.ls-on.ls-app .tab-page>.hint{color:rgba(255,255,255,.88);text-shadow:0 1px 8px rgba(0,0,0,.55)}
+/* event look for the dark start screens (onboarding / search) */
+html.ls-on .overlay-screen{background:linear-gradient(rgba(6,4,22,.5),rgba(6,4,22,.82)),var(--ls-bg-dark) center/cover no-repeat,#0a0a18}
+
+/* ---------- website hero ---------- */
+html.ls-on.ls-site .hero{isolation:isolate}
+html.ls-on.ls-site .hero::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;z-index:-1;pointer-events:none;
+  background:var(--ls-bg-land) center top/cover no-repeat;opacity:0;transition:opacity 1.4s ease;
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 38%,rgba(0,0,0,0) 78%);
+          mask-image:linear-gradient(180deg,#000 0,#000 38%,rgba(0,0,0,0) 78%)}
+html.ls-on.ls-site.ls-show .hero::before{opacity:1}
+
+/* ---------- effects layer ---------- */
+#ls-fx{position:fixed;left:0;top:0;right:0;bottom:0;z-index:110;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.1s ease}
+html.ls-show #ls-fx{opacity:1}
+#ls-fx canvas{position:absolute;left:0;top:0;width:100%;height:100%;transition:opacity .7s ease}
+.ls-garland{position:absolute;left:0;right:0;top:var(--ls-top,0px);height:70px}
+.ls-garland>svg{position:absolute;left:0;top:0;overflow:visible}
+.ls-b{position:absolute;width:var(--bw,8px);height:var(--bh,11px);margin-left:calc(var(--bw,8px)/-2);
+  border-radius:50% 50% 46% 46%/34% 34% 66% 66%;
+  background:radial-gradient(circle at 36% 28%,rgba(255,255,255,.95) 0 10%,var(--c) 46%,rgba(0,0,0,.4) 125%);
+  box-shadow:0 0 0 .6px rgba(0,0,0,.28)}
+.ls-b::before{content:"";position:absolute;left:25%;right:25%;top:-3px;height:4px;border-radius:1px;background:#1b1530}
+.ls-gl{position:absolute;width:var(--g,24px);height:var(--g,24px);margin:calc(var(--g,24px)/-2) 0 0 calc(var(--g,24px)/-2);
+  border-radius:50%;background:radial-gradient(circle,var(--c) 0,rgba(255,255,255,0) 68%)}
+.ls-gset{position:absolute;left:0;top:0;right:0;bottom:0;opacity:.8}
+.ls-ga{animation:ls-tw 2.8s ease-in-out infinite}
+.ls-gb{animation:ls-tw 3.6s ease-in-out -1.2s infinite}
+.ls-gc{animation:ls-tw 4.4s ease-in-out -2.4s infinite}
+@keyframes ls-tw{0%,100%{opacity:.32}50%{opacity:1}}
+.ls-hang{position:absolute;margin-left:calc(var(--hw,20px)/-2);width:var(--hw,20px);height:auto;display:block}
+.ls-hang.sw{transform-origin:50% 0;animation:ls-sway 5s ease-in-out infinite}
+@keyframes ls-sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.ls-spider{position:absolute;width:0;pointer-events:none}
+.ls-spider i{position:absolute;left:0;top:0;width:1.4px;margin-left:-.7px;background:rgba(255,255,255,.75);height:var(--th,50px)}
+.ls-spider img{position:absolute;left:-14px;top:var(--th,50px);width:28px;transform-origin:50% -50px;animation:ls-bob 4.6s ease-in-out infinite}
+@keyframes ls-bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(8px) rotate(3deg)}}
+.ls-bat{position:absolute;left:0;top:var(--y,40px);width:36px;will-change:transform;animation:ls-fly var(--d,12s) linear forwards}
+.ls-bat img{display:block;width:100%;animation:ls-flap .26s ease-in-out infinite alternate}
+@keyframes ls-fly{from{transform:translate3d(-60px,0,0)}to{transform:translate3d(calc(100vw + 70px),var(--dy,0px),0)}}
+@keyframes ls-flap{from{transform:scaleY(1)}to{transform:scaleY(.78) translateY(2px)}}
+
+/* ---------- toast + settings switch ---------- */
+.ls-toast{position:absolute;left:12px;right:12px;bottom:calc(var(--ls-toast-b,78px) + env(safe-area-inset-bottom));margin:0 auto;max-width:430px;
+  display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:16px;color:#fff;font:600 13px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:rgba(14,10,36,.92);border:1px solid rgba(255,255,255,.16);box-shadow:0 8px 28px rgba(0,0,0,.35);
+  opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.ls-toast.in{opacity:1;transform:none}
+.ls-toast b{font-weight:800}
+.ls-toast span{flex:1}
+.ls-toast button{pointer-events:auto;border:0;border-radius:10px;padding:7px 10px;font:700 12px system-ui,sans-serif;color:#fff;background:rgba(255,255,255,.16)}
+html.ls-halloween .ls-toast{border-color:rgba(255,138,31,.55)}
+html.ls-christmas .ls-toast{border-color:rgba(255,210,60,.55)}
+.ls-set{margin-top:12px;padding:15px}
+.ls-set-row{display:flex;align-items:center;gap:12px}
+.ls-set-row>div{flex:1;min-width:0}
+.ls-set-row b{display:block;font-size:15px}
+.ls-set-row span{display:block;margin-top:2px;font-size:12px;line-height:1.4;color:var(--muted,#6b6b78)}
+.ls-sw{flex:none;width:52px;height:30px;border:0;border-radius:16px;padding:0;position:relative;background:#cfd1d9;transition:background .25s}
+.ls-sw::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .25s}
+.ls-sw[aria-checked="true"]{background:var(--pink,#e0349a)}
+.ls-sw[aria-checked="true"]::after{transform:translateX(22px)}
+
+/* ---------- calm mode: tracking running / reduced motion / slow device ---------- */
+html.ls-calm .ls-ga,html.ls-calm .ls-gb,html.ls-calm .ls-gc{animation:none;opacity:.8}
+html.ls-calm .ls-hang.sw,html.ls-calm .ls-spider img{animation:none}
+html.ls-calm .ls-bat{display:none}
+html.ls-calm #ls-fx{display:none}   /* tracking: the whole effects layer leaves the render tree */
+html.ls-calm.ls-app .hero::before,html.ls-calm.ls-app .hero::after,html.ls-calm.ls-app .panel::before,html.ls-calm.ls-app .panel::after{filter:none}
+@media (prefers-reduced-motion:reduce){
+  .ls-ga,.ls-gb,.ls-gc{animation:none;opacity:.8}
+  .ls-hang.sw,.ls-spider img,.ls-bat{animation:none}
+  .ls-bat,#ls-fx canvas{display:none}
+  #ls-bg,#ls-fx,.ls-toast{transition:none}
+}
+
+/* ---------- card decorations (WebApp): grey cobwebs + pumpkins (Halloween), gifts (Christmas) ----------
+   Pure CSS on the existing cards, so cards added later get them too. The pictures sit on the bottom edge of a
+   card (less than half goes inside, into the padding) and never receive clicks. */
+html.ls-on.ls-app .hero,html.ls-on.ls-app .panel{position:relative;--sw:clamp(36px,9.5vw,54px);--cw:clamp(52px,15vw,84px)}
+html.ls-on.ls-app .hero::before,html.ls-on.ls-app .hero::after,
+html.ls-on.ls-app .panel::before,html.ls-on.ls-app .panel::after{content:"";position:absolute;pointer-events:none;z-index:2;background-repeat:no-repeat;background-position:center;background-size:contain}
+/* Halloween */
+html.ls-halloween.ls-app .hero::before,html.ls-halloween.ls-app .panel::before{
+  width:var(--cw);height:var(--cw);top:-3px;left:-3px;background-image:url("assets/seasonal/cobweb-grey.svg");opacity:.95}
+html.ls-halloween.ls-app .hero::before{left:auto;right:-3px;transform:scaleX(-1)}
+html.ls-halloween.ls-app .hero::after,html.ls-halloween.ls-app .panel::after{
+  width:var(--sw);height:calc(var(--sw)*.93);right:10px;bottom:calc(var(--sw)*-.46);
+  background-image:url("assets/seasonal/pumpkin-single.png");filter:drop-shadow(0 3px 3px rgba(40,10,0,.38))}
+html.ls-halloween.ls-app .panel:nth-of-type(odd)::after{width:calc(var(--sw)*1.32);height:calc(var(--sw)*.83);background-image:url("assets/seasonal/pumpkin-cluster.png")}
+/* Christmas */
+html.ls-christmas.ls-app .hero::before{
+  width:var(--sw);height:calc(var(--sw)*1.03);left:10px;bottom:calc(var(--sw)*-.5);background-image:url("assets/seasonal/gift-green.png");filter:drop-shadow(0 3px 3px rgba(20,0,0,.38))}
+html.ls-christmas.ls-app .hero::after,html.ls-christmas.ls-app .panel::after{
+  width:var(--sw);height:calc(var(--sw)*1.03);right:10px;bottom:calc(var(--sw)*-.5);
+  background-image:url("assets/seasonal/gift-yellow.png");filter:drop-shadow(0 3px 3px rgba(20,0,0,.38))}
+html.ls-christmas.ls-app .panel:nth-of-type(even)::after{background-image:url("assets/seasonal/gift-green.png")}
+/* the gift/pumpkin must not sit under the bottom navigation or be cut: leave room under the last card */
+html.ls-on.ls-app .tab-page>.panel:last-child{margin-bottom:calc(var(--sw,40px)*.5)}
