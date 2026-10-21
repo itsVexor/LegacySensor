@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>JD Motion Controller</title>
+<style>
+:root{--bg:#0d0a1c;--card:#1a1433;--ink:#f4f0ff;--mut:#9a90c4;--acc:#e0349a;--ok:#5cff79}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,sans-serif;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom);user-select:none;overscroll-behavior:none}
+h1{font-size:18px;margin:14px 0 8px}.card{background:var(--card);border-radius:16px;padding:14px;margin:10px 0}
+input,select,button{font:inherit;color:var(--ink);background:#261d4a;border:1px solid #3a2f6e;border-radius:12px;padding:12px}
+input{width:100%;font-size:26px;letter-spacing:6px;text-align:center}
+button{cursor:pointer}button.p{background:var(--acc);border:0;font-weight:700;width:100%;margin-top:10px}
+button:active{filter:brightness(1.4)}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
+.tabs{display:flex;gap:6px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}.tabs button{flex:1;padding:10px 4px;font-size:13px}.tabs .on{background:var(--acc);border:0}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pad button{height:84px;font-size:28px}
+.big{height:64px;font-size:17px}.mut{color:var(--mut);font-size:13px}.ok{color:var(--ok)}
+#bar{height:14px;background:#261d4a;border-radius:9px;overflow:hidden}#bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5cff79,#e0349a)}
+canvas{width:100%;height:110px;background:#120d27;border-radius:12px}
+#flash{font-size:42px;text-align:center;height:56px;font-weight:800;color:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:#261d4a;border-radius:12px;padding:6px;text-align:center;font-size:11px;width:84px}.chip img{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto 4px}
+pre{white-space:pre-wrap;word-break:break-all;font-size:11px;max-height:240px;overflow:auto;user-select:text}
+#touch{height:150px;background:#120d27;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--mut);touch-action:none}
+.hid{display:none}label{display:block;margin:10px 0 4px}
+</style></head><body>
+
+<section id="s1">
+ <h1>🕺 JD Motion Controller</h1>
+ <div class="card"><div class="mut">Wpisz kod parowania z gry (np. 59324063)</div>
+  <input id="code" inputmode="text" autocomplete="off" maxlength="12" placeholder="KOD">
+  <button class="p" id="go">POŁĄCZ I WŁĄCZ CZUJNIKI</button>
+  <div id="msg" class="mut" style="margin-top:8px"></div></div>
+</section>
+
+<section id="s2" class="hid">
+ <div class="tabs"><button data-t="d" class="on">Taniec</button><button data-t="c">Pilot</button><button data-t="i">Gra</button><button data-t="s">Ustaw.</button></div>
+
+ <div id="t-d" class="card">
+  <div id="flash">–</div>
+  <div class="mut">Energia ruchu (trzymaj telefon w prawej ręce)</div><div id="bar"><i></i></div>
+  <canvas id="cv" width="600" height="220"></canvas>
+  <div class="row" style="margin-top:8px"><button id="cal">Kalibruj „ręka w dół”</button><button id="mode">Poza: wył.</button></div>
+  <div class="mut" id="dbg" style="margin-top:6px"></div>
+ </div>
+
+ <div id="t-c" class="card hid">
+  <div id="touch">przesuń palcem = strzałki • tap = OK</div>
+  <div class="pad" style="margin-top:10px"><span></span><button data-k="up">▲</button><span></span><button data-k="left">◀</button><button data-k="enter" class="big">OK</button><button data-k="right">▶</button><span></span><button data-k="down">▼</button><span></span></div>
+  <div class="row" style="margin-top:10px"><button data-k="escape" class="big">Wstecz</button><button data-k="space" class="big">Pauza</button><button data-k="tab" class="big">Menu</button></div>
+ </div>
+
+ <div id="t-i" class="card hid"><div id="who" class="mut">—</div><div class="chips" id="chips"></div>
+  <div class="mut" style="margin-top:10px">Surowa odpowiedź serwera:</div><pre id="raw"></pre></div>
+
+ <div id="t-s" class="card hid">
+  <label>Czułość gestów: <b id="sv"></b></label><input type="range" id="sens" min="4" max="24" style="padding:0;letter-spacing:0">
+  <label>Gest → klawisz w grze</label><div id="map"></div>
+  <label><input type="checkbox" id="vib" style="width:auto;display:inline"> Wibracje przy geście</label>
+  <button id="disc" style="margin-top:12px;width:100%">Rozłącz</button>
+ </div>
+</section>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const KEYS=['—','up','down','left','right','enter','escape','space','tab'];
+const GEST={swipeUp:'⬆ machnięcie w górę',swipeDown:'⬇ w dół',swipeLeft:'⬅ w lewo',swipeRight:'➡ w prawo',punch:'👊 pchnięcie',shake:'🌀 potrząśnięcie'};
+const DEF={swipeUp:'up',swipeDown:'down',swipeLeft:'left',swipeRight:'right',punch:'enter',shake:'escape'};
+const S=Object.assign({sens:12,vib:true,map:DEF},JSON.parse(localStorage.getItem('jdm')||'{}'));
+const save=()=>{try{localStorage.setItem('jdm',JSON.stringify(S))}catch(e){}};
+let ws,wake,poseOn=false,code='';
+
+/* ---------- połączenie ---------- */
+$('#code').value=(localStorage.getItem('jdcode')||'');
+$('#go').onclick=async()=>{
+  code=$('#code').value.trim().toUpperCase(); if(!code)return msg('Wpisz kod.');
+  // iOS: zgoda na czujniki MUSI być w tapnięciu użytkownika
+  try{ if(DeviceMotionEvent?.requestPermission){ if(await DeviceMotionEvent.requestPermission()!=='granted') return msg('Brak zgody na czujniki ruchu.'); }
+       if(DeviceOrientationEvent?.requestPermission) await DeviceOrientationEvent.requestPermission(); }catch(e){}
+  msg('Parowanie z grą…');
+  let info; try{ info=await (await fetch('/api/pair?code='+encodeURIComponent(code))).json(); }catch(e){ return msg('Most PC niedostępny: '+e.message); }
+  if(!info.ok) return msg('Gra nie odpowiada: '+info.error);
+  localStorage.setItem('jdcode',code); showInfo(info);
+  ws=new WebSocket(`wss://${location.host}/motion-ws`);
+  ws.onopen=()=>{$('#s1').classList.add('hid');$('#s2').classList.remove('hid');startSensors();try{navigator.wakeLock?.request('screen').then(l=>wake=l)}catch(e){}};
+  ws.onclose=()=>{ $('#flash').textContent='rozłączono'; };
+};
+$('#disc').onclick=()=>{ws?.close();location.reload()};
+const msg=t=>$('#msg').textContent=t;
+const send=o=>ws&&ws.readyState===1&&ws.send(JSON.stringify(o));
+const press=k=>{ if(k&&k!=='—'){send({t:'key',k}); if(S.vib)navigator.vibrate?.(20);} };
+
+/* ---------- dane z gry: postacie i assety ---------- */
+function showInfo(info){
+  $('#raw').textContent=JSON.stringify(info.data,null,1).slice(0,6000);
+  const txt=JSON.stringify(info.data), chips=$('#chips'); chips.innerHTML='';
+  const ids=new Set(); // szukamy tego, co pasuje do assetów lokalnych (avatary/coach/tła)
+  (txt.match(/[A-Za-z0-9_]{3,40}/g)||[]).forEach(w=>ids.add(w));
+  const dirs=[['avatars',['','_ava','Ava']],['coaches',['_coach_1_big','_Coach_1','_coach_1']],['backgrounds',['']]];
+  ids.forEach(w=>dirs.forEach(([d,sf])=>sf.forEach(s=>{
+    const u=`/assets/${d}/${w}${s}.png`, im=new Image();
+    im.onload=()=>{ if(chips.querySelector(`[data-u="${u}"]`))return; const c=document.createElement('div');c.className='chip';c.dataset.u=u;c.append(im,w);chips.append(c)};
+    im.src=u; })));
+  const n=info.data?.nickname||info.data?.name||info.data?.profileName||info.data?.playerName;
+  $('#who').textContent=(n?('Gracz: '+n+' • '):'')+'serwer: '+info.server;
+}
+
+/* ---------- czujniki + gesty ---------- */
+const cv=$('#cv'),g=cv.getContext('2d'),hist=[];let energy=0,last=0,lastShake=0,ref={b:0,g:0},ori={b:0,g:0,a:0},shakeN=0,shakeT=0;
+addEventListener('deviceorientation',e=>{ori={a:e.alpha||0,b:e.beta||0,g:e.gamma||0}});
+function startSensors(){ addEventListener('devicemotion',onMotion); setInterval(sendHand,33); }
+function onMotion(e){
+  const a=e.acceleration||{}, ag=e.accelerationIncludingGravity||{};
+  let x=a.x,y=a.y,z=a.z;
+  if(x==null){ // brak „czystego” przyspieszenia -> odejmij grawitację filtrem
+    LP.x=LP.x*.9+(ag.x||0)*.1;LP.y=LP.y*.9+(ag.y||0)*.1;LP.z=LP.z*.9+(ag.z||0)*.1; x=(ag.x||0)-LP.x;y=(ag.y||0)-LP.y;z=(ag.z||0)-LP.z; }
+  const m=Math.hypot(x,y,z), now=performance.now();
+  energy=energy*.92+m*.08; hist.push(m); if(hist.length>150)hist.shift();
+  $('#bar i').style.width=Math.min(100,energy*9)+'%'; draw();
+  // oś w układzie telefonu trzymanego pionowo ekranem do siebie: x=prawo/lewo, y=góra/dół, z=do/od ekranu
+  const T=S.sens, ax=Math.abs(x),ay=Math.abs(y),az=Math.abs(z);
+  if(m>T&&now-last>380){
+    let gst;
+    if(az>ax&&az>ay) gst='punch'; else if(ax>ay) gst=x>0?'swipeRight':'swipeLeft'; else gst=y>0?'swipeUp':'swipeDown';
+    last=now; fire(gst);
+  }
+  // shake: kilka silnych zmian znaku w krótkim oknie
+  if(m>T*1.4){ if(now-shakeT>600)shakeN=0; shakeT=now; shakeN++; if(shakeN>=6&&now-lastShake>1200){lastShake=now;shakeN=0;fire('shake')} }
+}
+const LP={x:0,y:0,z:0};
+function fire(gst){ $('#flash').textContent=GEST[gst]; clearTimeout(fire.t); fire.t=setTimeout(()=>$('#flash').textContent='–',700); press(S.map[gst]); }
+function draw(){ g.clearRect(0,0,600,220); g.strokeStyle='#e0349a'; g.lineWidth=3; g.beginPath();
+  hist.forEach((v,i)=>{const X=i*4,Y=215-Math.min(v*10,210); i?g.lineTo(X,Y):g.moveTo(X,Y)}); g.stroke();
+  g.strokeStyle='#5cff7966';g.setLineDash([6,6]);g.beginPath();g.moveTo(0,215-S.sens*10);g.lineTo(600,215-S.sens*10);g.stroke();g.setLineDash([]); }
+
+/* ---------- pozycja ręki z orientacji (poza dla gry, tryb eksperymentalny) ---------- */
+$('#cal').onclick=()=>{ref={b:ori.b,g:ori.g};$('#dbg').textContent='Skalibrowano – opuść rękę z telefonem wzdłuż ciała.'};
+$('#mode').onclick=()=>{poseOn=!poseOn;$('#mode').textContent='Poza: '+(poseOn?'WŁ.':'wył.')};
+function sendHand(){ if(!poseOn)return;
+  const cl=v=>Math.max(-1,Math.min(1,v));
+  // beta (pochylenie przód/tył) -> ręka w górę/dół; gamma (przechył) -> ręka w bok
+  const y=cl((ori.b-ref.b)/70), x=cl((ori.g-ref.g)/70), z=cl(energy/12);
+  $('#dbg').textContent=`ręka x:${x.toFixed(2)} y:${y.toFixed(2)} z:${z.toFixed(2)}`; send({t:'hand',x,y,z}); }
+
+/* ---------- pilot dotykowy ---------- */
+$$('[data-k]').forEach(b=>b.onclick=()=>press(b.dataset.k));
+let t0;const tp=$('#touch');
+tp.ontouchstart=e=>{t0={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}};
+tp.ontouchend=e=>{const c=e.changedTouches[0],dx=c.clientX-t0.x,dy=c.clientY-t0.y;
+  if(Math.hypot(dx,dy)<18) return press('enter');
+  press(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'))};
+
+/* ---------- UI ---------- */
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  ['d','c','i','s'].forEach(k=>$('#t-'+k).classList.toggle('hid',k!==b.dataset.t))});
+$('#sens').value=S.sens;$('#sv').textContent=S.sens;$('#sens').oninput=e=>{S.sens=+e.target.value;$('#sv').textContent=S.sens;save()};
+$('#vib').checked=S.vib;$('#vib').onchange=e=>{S.vib=e.target.checked;save()};
+Object.keys(GEST).forEach(k=>{const r=document.createElement('div');r.className='row';r.style.margin='6px 0';
+  r.innerHTML=`<span>${GEST[k]}</span><select>${KEYS.map(o=>`<option ${S.map[k]===o?'selected':''}>${o}</option>`).join('')}</select>`;
+  r.querySelector('select').onchange=e=>{S.map[k]=e.target.value;save()};$('#map').append(r)});
+</script></body></html>
