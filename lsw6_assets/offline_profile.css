@@ -1,0 +1,23 @@
+/* W6 — no online auth or leaderboard, keep W2 galleries and W4 local QR bridge. */
+body #profileSeg, body #profileBoardView {display:none!important}
+body #profileCardView {display:block!important}
+body .lsw5-identity {border:1px solid #A778DA;border-radius:22px;background:linear-gradient(128deg,rgba(82,39,151,.97),rgba(35,17,73,.98));padding:18px;color:#fff;margin:14px 0;box-shadow:0 10px 26px rgba(11,2,30,.26)}
+body .lsw5-hero-left{display:flex;align-items:center;gap:15px;min-width:0}
+body .lsw5-portrait{width:72px;height:72px;object-fit:contain;border-radius:19px;background:#512C89;border:2px solid #EEA1DE}
+body .lsw5-kicker{font-size:10px;color:#F9B9E9;font-weight:900;letter-spacing:1px}
+body .lsw5-name{font-size:24px;color:#fff;margin:5px 0;overflow-wrap:anywhere}
+body .lsw5-sub{font-size:12px;color:#E6CFF9;margin:0}
+body .lsw5-numbers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:16px}
+body .lsw5-value{min-width:0;border:1px solid #9268CA;border-radius:17px;background:#5A3188;padding:11px 12px}
+body .lsw5-value b{font-size:22px;color:#fff;display:block}
+body .lsw5-value small{color:#EAD1FF;font-size:10px;font-weight:800;letter-spacing:.6px}
+body .lsw5-foot{color:#E6D3F5;font-size:12px;line-height:1.5;margin-top:14px}
+body .lsw5-hold-note{margin:14px 0;padding:15px;border-radius:18px;background:#382064;border:1px solid #A86BD5;color:#F1DCFF;font-size:13px;line-height:1.45}
+body:not(.lsw5-pc-linked) #lsw5Identity, body:not(.lsw5-pc-linked) .lsw5-hold-note {display:none!important}
+body.lsw5-pc-linked #lsw3ProfileLink,body.lsw5-pc-linked #lswProfileHero,body.lsw5-pc-linked #lsw4Summary,body.lsw5-pc-linked #lsw4Toggle,body.lsw5-pc-linked #lsw4BoardNote {display:none!important}
+body.lsw5-pc-linked #profileCardView>.hero,body.lsw5-pc-linked #profileCardView>.panel,body.lsw5-pc-linked #tab-home #challengeList,body.lsw5-pc-linked #tab-home .challenge-reset-hint {display:none!important}
+body.lsw5-pc-linked #gmKnob{pointer-events:none;filter:grayscale(.2)}
+body.lsw5-pc-linked #tab-gift .gm-cost {display:none}
+body.lsw5-pc-linked #lsw4UnifiedProfile{margin-top:10px}
+body.lsw5-pc-linked #lsw4UnifiedProfile .lsw4-choice-label{display:none}
+@media(min-width:540px){body .lsw5-numbers{grid-template-columns:repeat(4,minmax(0,1fr))}}

@@ -1,0 +1,20 @@
+#lsw4UnifiedProfile{margin:14px 0;padding:18px 16px;border-radius:22px;background:linear-gradient(145deg,rgba(76,32,132,.98),rgba(32,13,73,.98));border:1px solid rgba(221,159,255,.65);color:#fff;box-shadow:0 12px 26px #1b09383d}
+#lsw4UnifiedProfile .lsw4-eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#ffc5ea}
+#lsw4UnifiedProfile h3{font-size:19px;margin:7px 0 5px;line-height:1.25;color:white}
+#lsw4UnifiedProfile .lsw4-status{font-size:12px;line-height:1.5;color:#ebdaff;margin:7px 0 13px}
+#lsw4UnifiedProfile .lsw4-status.on{color:#bafce0}
+#lsw4UnifiedProfile .lsw4-summary,#lsw4UnifiedProfile .lsw4-collection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:11px 0}
+#lsw4UnifiedProfile .lsw4-number{padding:11px;border:1px solid #8c64c1;background:#532e82;border-radius:15px;min-width:0;overflow-wrap:anywhere}
+#lsw4UnifiedProfile .lsw4-number strong{display:block;color:#fff;font-size:20px;line-height:1.25;font-weight:900}
+#lsw4UnifiedProfile .lsw4-number small{display:block;font-size:10px;font-weight:900;letter-spacing:.6px;color:#ebd8ff;margin-top:3px}
+#lsw4UnifiedProfile .lsw4-choice-label{font-size:10px;color:#f3bfe7;letter-spacing:1.3px;font-weight:900;margin:14px 0 7px}
+#lsw4UnifiedProfile .lsw4-actions{display:flex;flex-wrap:wrap;gap:7px}
+#lsw4UnifiedProfile button{font-family:inherit;font-weight:800;border-radius:13px;font-size:12px;min-height:38px;padding:9px 12px;touch-action:manipulation}
+#lsw4UnifiedProfile .lsw4-toggle{flex:1;min-width:135px;border:1px solid #ffbff0;background:linear-gradient(120deg,#f143a9,#a13de1);color:white}
+#lsw4UnifiedProfile .lsw4-refresh{flex:1;border:1px solid #9863c7;background:#44246d;color:#fff}
+#lsw4UnifiedProfile .lsw4-disconnect{border:1px solid #9863c7;background:transparent;color:#dcc9ef}
+#lsw4UnifiedProfile .lsw4-collection{margin-top:14px;padding-top:13px;border-top:1px solid #835cb0}
+#lsw4UnifiedProfile .lsw4-collection-title{display:block;font-size:12px;color:#ffd6ed;letter-spacing:1px}
+#lsw4UnifiedProfile .lsw4-rewards,#lsw4UnifiedProfile .lsw4-disclaimer{font-size:11px;line-height:1.6;color:#d7c8ed;margin:9px 0 0}
+#lsw4BoardNote{border:1px solid rgba(250,151,226,.5);background:rgba(95,41,137,.25);border-radius:14px;color:#f6d2ee;padding:12px;font-size:12px;line-height:1.5;margin:0 0 12px}
+@media(min-width:480px){#lsw4UnifiedProfile .lsw4-summary{grid-template-columns:repeat(4,minmax(0,1fr))}}
