@@ -1,2 +1,0 @@
-aiohttp>=3.10,<4
-qrcode[pil]>=7.4
