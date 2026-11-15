@@ -1,0 +1,13 @@
+/* Legacy Sensor v1.7 Beta screenshot gallery refresh — visual only */
+.topbar{gap:clamp(8px,1.4vw,20px);justify-content:space-between}
+.topbar .nav{min-width:0;flex:1;justify-content:center}
+.topbar .nav a{white-space:nowrap}
+.hero-shot{border-radius:16px;box-shadow:0 14px 36px rgba(22,7,58,.22)}
+.shot-stage{box-shadow:0 22px 56px rgba(20,9,51,.18)}
+.shot-frame img{aspect-ratio:1366/724;object-fit:contain;background:#23123c}
+.thumbs{scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#9b59d6 transparent;gap:12px}
+.thumb{scroll-snap-align:start;flex-basis:160px;transition:transform .18s ease,box-shadow .18s ease}
+.thumb:focus-visible{outline:3px solid #9b4be5;outline-offset:3px}
+.thumb.active{box-shadow:0 5px 18px rgba(51,22,113,.20);transform:translateY(-2px)}
+.thumb img{display:block;width:100%;height:auto;aspect-ratio:1366/724;object-fit:cover}
+@media(max-width:680px){.thumb{flex-basis:118px}.shot-stage{gap:10px}.shot-copy{padding:12px}}

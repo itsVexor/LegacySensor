@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Troubleshooting for Legacy Sensor by ItsVexor: camera detection, body tracking, performance, Phone Sensor pairing, Windows firewall and supported Just Dance PC games." />
+  <meta name="theme-color" content="#180f35" />
+  <link rel="canonical" href="https://itsvexor.github.io/LegacySensor/troubleshooting.html" />
+  <title>Legacy Sensor Troubleshooting · ItsVexor</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Legacy Sensor by ItsVexor" />
+  <meta property="og:title" content="Legacy Sensor Troubleshooting" />
+  <meta property="og:description" content="Fix camera, tracking, Phone Sensor pairing and game compatibility issues." />
+  <meta property="og:url" content="https://itsvexor.github.io/LegacySensor/troubleshooting.html" />
+  <meta property="og:image" content="https://itsvexor.github.io/LegacySensor/assets/brand/TitleScreen.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,500;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=seasonfix2" />
+  <link rel="stylesheet" href="pwa-polish.css?v=1.8.0" />
+  <link rel="stylesheet" href="seasonal.css?v=seasonfix2">
+  <link rel="stylesheet" href="wow-refresh.css?v=1.8.0">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html#home" aria-label="Legacy Sensor home"><img src="assets/brand/watermark.png" alt="Legacy Sensor by ItsVexor" /></a>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html#home">Home</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#compatibility">Compatibility</a>
+      <a class="active" href="troubleshooting.html">Troubleshooting</a>
+      <a href="index.html#changelog">Changelog</a>
+      <a href="index.html#download">Download</a>
+      <a href="webapp.html">Phone Sensor</a>
+    </nav>
+    <!-- Legacy Account in the right-hand side of the original top bar -->
+
+    <a class="button button-primary top-download" href="index.html#download">Download</a>
+  </header>
+
+  <main class="troubleshooting-page">
+    <section class="trouble-hero">
+      <span class="section-tag">Support & setup</span>
+      <h1>Let's get you dancing again.</h1>
+      <p>Start with the quick checks below. For game-specific problems, check the <a href="index.html#compatibility"><strong>compatibility table</strong></a> first — a setup fix cannot make an unsupported game build compatible.</p>
+      <div class="trouble-hero-actions">
+        <a class="button button-primary" href="index.html#compatibility">Check game compatibility</a>
+        <a class="button button-soft" href="webapp.html#pairing">Phone Sensor pairing guide</a>
+        <a class="button button-soft" href="https://www.youtube.com/@TheJDVexor" target="_blank" rel="noopener noreferrer">Browse video guides</a>
+      </div>
+      <p class="trouble-video-note">A dedicated 2–3 minute first-install walkthrough is not linked yet; the channel button opens the existing project videos.</p>
+    </section>
+
+    <section class="trouble-section" aria-labelledby="quick-start-title">
+      <div class="section-heading"><div><span class="section-tag">Before you start</span><h2 id="quick-start-title">Quick setup checklist</h2></div></div>
+      <div class="trouble-grid trouble-grid-three">
+        <article class="trouble-card"><span class="trouble-number">01</span><h3>Install cleanly</h3><p>Download the ZIP from the official project page and extract the entire archive to a normal folder. Do not run the app from inside the ZIP.</p></article>
+        <article class="trouble-card"><span class="trouble-number">02</span><h3>Prepare the camera</h3><p>Choose the correct webcam or supported virtual camera in Legacy Sensor. Keep your full body visible and avoid strong light behind you.</p></article>
+        <article class="trouble-card"><span class="trouble-number">03</span><h3>Check the game</h3><p>Use a game and version listed as supported. Legacy Just Dance PC by DIEGUINHODG is currently the recommended setup.</p></article>
+      </div>
+    </section>
+
+    <section class="trouble-section trouble-section-violet" aria-labelledby="camera-issues-title">
+      <div class="section-heading"><div><span class="section-tag">Camera & tracking</span><h2 id="camera-issues-title">Common problems</h2></div></div>
+      <div class="trouble-accordion">
+        <details open><summary>My camera is not detected</summary><div class="trouble-answer"><ol><li>Close apps that may already be using the camera, such as video-call software, OBS or another camera utility.</li><li>In Windows, open <strong>Settings → Privacy & security → Camera</strong> and allow camera access for desktop apps.</li><li>Reconnect the USB camera, try another direct USB port and reopen Legacy Sensor.</li><li>In the app, select the correct camera source. Virtual cameras may have their own start/enable switch.</li></ol></div></details>
+        <details><summary>The body or joints are not tracking correctly</summary><div class="trouble-answer"><ol><li>Move farther back until your whole body, including feet and hands, fits inside the camera frame.</li><li>Face the camera and keep the room evenly lit. Avoid bright windows or lamps directly behind you.</li><li>Make sure the camera is stable and not being moved during play.</li><li>Try the camera test / tracking view before opening the game.</li></ol></div></details>
+        <details><summary>Tracking is delayed or FPS is low</summary><div class="trouble-answer"><ol><li>Close other camera, browser and video applications that are using CPU or GPU resources.</li><li>Try a lower camera resolution or FPS setting in Legacy Sensor, then compare smoothness.</li><li>Connect a USB webcam directly to the PC instead of through an unpowered hub.</li><li>Improve room lighting so the camera does not need to compensate for a very dark scene.</li></ol><p class="trouble-note">There is no published minimum CPU/GPU specification yet. As a practical starting point, a 720p camera running around 30 FPS is useful where your camera and PC can sustain it; this is a recommendation, not a guaranteed minimum.</p></div></details>
+      </div>
+    </section>
+
+    <section class="trouble-section" aria-labelledby="phone-issues-title">
+      <div class="section-heading"><div><span class="section-tag">Phone Sensor / WebApp</span><h2 id="phone-issues-title">Pairing and network help</h2></div></div>
+      <div class="trouble-grid">
+        <article class="trouble-card"><h3>Phone cannot connect</h3><ul><li>Connect the phone and PC to the same local Wi-Fi network.</li><li>Avoid guest Wi-Fi networks or router settings that isolate wireless devices from each other.</li><li>Temporarily disable VPN on the phone and PC while pairing.</li><li>Refresh the WebApp and scan the current QR code again.</li></ul><a class="text-link" href="webapp.html#pairing">Open the pairing walkthrough →</a></article>
+        <article class="trouble-card"><h3>Windows Firewall warning</h3><ul><li>Allow Legacy Sensor on <strong>Private networks</strong> when Windows asks, if you trust the local network.</li><li>Do not allow it on public networks unless you have a specific reason.</li><li>Do not forward router ports to the internet for local Phone Sensor pairing.</li><li>If you previously blocked the app, review its Windows Defender Firewall permission and retry.</li></ul></article>
+      </div>
+    </section>
+
+    <section class="trouble-section trouble-section-yellow" id="game-not-detected" aria-labelledby="game-issues-title">
+      <div class="section-heading"><div><span class="section-tag">Game compatibility</span><h2 id="game-issues-title">The game does not receive input</h2></div></div>
+      <div class="trouble-grid">
+        <article class="trouble-card"><h3>Legacy Just Dance PC</h3><p>This is the currently recommended and fully working game setup. Confirm that you are using the supported PC build and the current Legacy Sensor release, then follow the setup guide included with the app.</p></article>
+        <article class="trouble-card"><h3>JD2021 PC by Dreyn</h3><p>Recent Legacy Sensor releases do not currently provide reliable support for this game. Historical screenshots or older app versions do not mean that the current release supports it. Older versions, including v1.4.0, need separate testing.</p></article>
+      </div>
+      <p class="trouble-note trouble-note-wide">Before changing DLLs or configuration files, make a backup of the game folder. Use only files and steps explicitly provided for the exact game build you are testing.</p>
+    </section>
+
+    <section class="trouble-section" aria-labelledby="linux-issues-title">
+      <div class="section-heading"><div><span class="section-tag">Linux</span><h2 id="linux-issues-title">Linux launch checklist</h2></div></div>
+      <div class="trouble-card trouble-card-wide"><p>The current Linux package is v1.6.0 Beta; the latest Windows beta is v1.7.0. Linux is on an older release branch.</p><ol><li>Extract the complete Linux ZIP to a folder you can write to.</li><li>Open a terminal in that extracted folder.</li><li>Make the application executable with the command shown in the download section: <code>chmod +x LegacySensor-v1.6.0-BETA</code>.</li><li>Launch it with <code>./LegacySensor-v1.6.0-BETA</code>.</li></ol><p>That package is intended for Linux Mint / Ubuntu-based systems. Other distributions may need additional dependencies.</p><a class="button button-primary" href="index.html#download">Get Linux v1.6.0</a></div>
+    </section>
+
+    <section class="trouble-section trouble-section-violet" aria-labelledby="report-title">
+      <div class="section-heading"><div><span class="section-tag">Still stuck?</span><h2 id="report-title">Send a useful bug report</h2></div></div>
+      <div class="trouble-card trouble-card-wide"><p>When reporting a problem, include these details so it can be reproduced:</p><ul><li>Legacy Sensor version (for example, v1.7.0 Beta).</li><li>Windows or Linux version.</li><li>Game name and exact game build.</li><li>Camera model or Phone Sensor device, plus selected resolution / FPS.</li><li>What you expected, what happened instead, and the steps just before the issue.</li><li>A screenshot or the relevant application log, if available. Remove personal information before sharing logs publicly.</li></ul><div class="trouble-hero-actions"><a class="button button-primary" href="https://www.youtube.com/@TheJDVexor" target="_blank" rel="noopener noreferrer">Project channel</a><a class="button button-soft" href="index.html#discord">Community links</a></div></div>
+    </section>
+  </main>
+
+  <footer>
+    <img src="assets/brand/watermark.png" alt="Legacy Sensor by ItsVexor" />
+    <p>Legacy Sensor by ItsVexor &middot; Fan project &middot; 2026<br><span class="footer-disclaimer">Unofficial fan-made project. Not affiliated with or endorsed by Ubisoft.</span></p>
+    <div class="footer-links"><a href="index.html#home">Home</a><a href="index.html#compatibility">Compatibility</a><a href="index.html#download">Download</a></div>
+  </footer>
+  <script src="seasonal.js?v=seasonfix2" defer></script>
+</body>
+</html>

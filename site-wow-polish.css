@@ -1,0 +1,78 @@
+/* Legacy Sensor 1.8.2 — navigation + dance-floor visual polish */
+:root{--ls-ink:#100b27;--ls-pink:#f34bb8;--ls-orange:#ffad4d;--ls-cyan:#55e7ef;--ls-violet:#a66aff}
+
+/* Header follows the reference: compact logo, readable links, persistent right CTA. */
+.topbar{height:74px;min-height:74px;padding:0 clamp(22px,3.7vw,54px);gap:clamp(12px,1.4vw,22px);background:rgba(16,11,39,.91);border-bottom:1px solid rgba(255,255,255,.10);box-shadow:0 9px 36px rgba(5,2,24,.34);}
+.brand{height:49px;}
+.nav{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:flex-start;gap:2px;overflow:visible;}
+.nav a{flex:0 0 auto;padding:10px clamp(7px,.85vw,12px);font-size:9.5px;letter-spacing:.075em;color:#e9e3f5;white-space:nowrap;}
+.nav a.active{background:linear-gradient(112deg,#f04db6,#a85cff);box-shadow:0 7px 22px rgba(243,75,184,.26);}
+.nav a[href="#download"]{color:#ffb3dd;}
+.nav a[href="#download"]:hover{background:rgba(243,75,184,.15);color:#fff;}
+.top-download{display:inline-flex!important;flex:0 0 auto;align-items:center;gap:13px;padding:11px 19px!important;min-height:43px;border:0!important;border-radius:999px!important;background:linear-gradient(105deg,#ffad4d 0%,#ff775d 48%,#f34bb8 100%)!important;color:#23102f!important;font-size:10px!important;letter-spacing:.08em!important;font-weight:1000!important;box-shadow:0 8px 26px rgba(243,75,184,.22)!important;}
+.top-download-arrow{font-size:15px;line-height:1;transition:transform .2s ease;}
+.top-download:hover .top-download-arrow{transform:translate(2px,-2px);}
+.top-download:hover{filter:brightness(1.08) saturate(1.1);box-shadow:0 12px 32px rgba(243,75,184,.34)!important;}
+
+/* Hero atmosphere: layered spotlights, glass meter and floating callout. */
+.hero{position:relative;isolation:isolate;}
+.hero::after{content:"";position:absolute;z-index:-1;pointer-events:none;width:min(75vw,980px);height:min(75vw,980px);right:-24%;top:-52%;border:1px solid rgba(255,255,255,.13);border-radius:50%;box-shadow:0 0 0 34px rgba(255,255,255,.025),0 0 0 82px rgba(255,255,255,.018),0 0 0 144px rgba(255,255,255,.012);animation:ls-orbit 48s linear infinite;}
+.hero-inner{position:relative;}
+.hero-copy{max-width:650px;}
+.hero h1 .line-pink{box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+.hero-energy{width:min(100%,510px);min-height:58px;margin:23px 0 0;padding:10px 14px;display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:14px;row-gap:7px;border:1px solid rgba(255,255,255,.25);border-radius:15px;background:linear-gradient(110deg,rgba(20,8,47,.32),rgba(255,255,255,.10));box-shadow:0 12px 28px rgba(20,4,48,.16);backdrop-filter:blur(13px);}
+.hero-energy-mark{display:flex;align-items:center;gap:7px;color:#fff;font-size:8px;font-weight:1000;letter-spacing:.15em;white-space:nowrap;}
+.hero-energy-dot{width:7px;height:7px;border-radius:50%;background:#6bf6d2;box-shadow:0 0 0 4px rgba(107,246,210,.12),0 0 13px rgba(107,246,210,.75);}
+.hero-energy-wave{height:23px;display:flex;align-items:center;justify-content:flex-end;gap:3px;overflow:hidden;}
+.hero-energy-wave i{display:block;width:3px;height:var(--bar,12px);border-radius:9px;background:linear-gradient(180deg,#fff1b4,#ff6fbe 62%,#57e5ef);transform-origin:center;opacity:.95;}
+.hero-energy-wave i:nth-child(3n){--bar:19px}.hero-energy-wave i:nth-child(4n){--bar:8px}.hero-energy-wave i:nth-child(5n){--bar:15px}.hero-energy-wave i:nth-child(7n){--bar:22px}
+.hero-energy-caption{grid-column:1/-1;color:rgba(255,255,255,.77);font-size:7px;font-weight:900;letter-spacing:.13em;white-space:nowrap;}
+.hero-energy-caption b{color:#ffca69;padding:0 5px;}
+.hero-shot-wrap{perspective:1200px;}
+.hero-shot{transform-style:preserve-3d;}
+.hero-shot-wrap::before{content:"";position:absolute;inset:8% -6% -8% 7%;z-index:-1;border-radius:30px;background:linear-gradient(120deg,rgba(255,192,89,.5),rgba(244,71,179,.38),rgba(68,219,236,.45));filter:blur(38px);opacity:.7;}
+
+/* The ticker and section transitions feel more like a dance-game launch site. */
+.dance-ticker{isolation:isolate;}
+.dance-ticker::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,.22),transparent 20% 80%,rgba(255,255,255,.18));mix-blend-mode:soft-light;}
+.section-title,.section-heading{position:relative;}
+.section-tag{border-radius:999px;box-shadow:0 7px 18px rgba(8,3,29,.14);}
+.feature-grid article,.how-card,.gameplay-card,.pwa-card,.changelog-card{transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease;}
+.feature-grid article:hover,.how-card:hover,.gameplay-card:hover{transform:translateY(-6px);}
+
+/* Clear anchor landing and a bold download surface. */
+#download{scroll-margin-top:86px;}
+.download-section{position:relative;isolation:isolate;}
+.download-section::before{content:"";position:absolute;z-index:-1;top:-90px;right:-100px;width:360px;height:360px;border:1px solid rgba(58,19,63,.12);border-radius:50%;box-shadow:0 0 0 30px rgba(255,255,255,.10),0 0 0 75px rgba(255,255,255,.07);pointer-events:none;}
+.download-copy .button-primary{background:linear-gradient(105deg,#2a174b,#6c3eb4)!important;color:#fff!important;box-shadow:0 9px 24px rgba(51,20,73,.20)!important;}
+.download-copy .button-primary:hover{box-shadow:0 14px 30px rgba(51,20,73,.28)!important;}
+
+/* Mobile: keep the quick dock and a simple right CTA; never squeeze the desktop links. */
+@media(min-width:761px) and (max-width:1180px){
+  .topbar{padding:0 18px;gap:8px;}
+  .brand{height:44px;}
+  .nav{gap:0;}
+  .nav a{font-size:8px;padding:9px 6px;letter-spacing:.045em;}
+  .top-download{padding:10px 12px!important;font-size:8px!important;gap:7px;}
+}
+@media(max-width:760px){
+  .topbar{height:66px;min-height:66px;padding:8px 15px;flex-wrap:nowrap;justify-content:space-between;}
+  .brand{height:42px;}
+  .topbar .nav{display:none;}
+  .top-download{display:inline-flex!important;font-size:9px!important;padding:9px 13px!important;min-height:38px;}
+  .hero-energy{width:100%;grid-template-columns:auto 1fr;padding:9px 11px;margin-top:18px;}
+  .hero-energy-caption{font-size:6px;letter-spacing:.08em;}
+  .hero-shot-wrap::before{inset:8% -2% -5%;}
+}
+@media(max-width:390px){.hero-energy-mark{font-size:7px}.hero-energy-caption{font-size:5.5px}}
+@media(prefers-reduced-motion:no-preference){
+  .hero-energy-wave i{animation:ls-wave 1.05s ease-in-out infinite alternate;}
+  .hero-energy-wave i:nth-child(2n){animation-delay:-.35s}.hero-energy-wave i:nth-child(3n){animation-delay:-.7s}.hero-energy-wave i:nth-child(5n){animation-delay:-.52s}
+  @keyframes ls-wave{from{transform:scaleY(.42);opacity:.55}to{transform:scaleY(1.12);opacity:1}}
+  @keyframes ls-orbit{to{transform:rotate(360deg)}}
+}
+@media(prefers-reduced-motion:reduce){.hero::after,.hero-energy-wave i{animation:none!important}.feature-grid article:hover,.how-card:hover,.gameplay-card:hover{transform:none}}
+
+/* v1.7.0 Accounts local preview: one centered PWA installation card (reminders retired). */
+.pwa-hub-grid { grid-template-columns: minmax(0, 1fr); max-width: 780px; }
+.pwa-hub-grid > .install-card { width: 100%; }

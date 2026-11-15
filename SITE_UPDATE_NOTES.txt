@@ -1,0 +1,27 @@
+LEGACY SENSOR WEBSITE UPDATE — GITHUB PAGES / PWA PATCH
+
+Website host:
+- GitHub Pages project site: https://itsvexor.github.io/LegacySensor/
+- Source repository: https://github.com/itsVexor/LegacySensor
+- All project-site URLs, manifest paths, service-worker assets and notification click destinations are relative to /LegacySensor/.
+
+Website content:
+- Compatibility table for Legacy JD2018 PC, JD2021 PC by Dreyn, and Just Dance Liminal.
+- Troubleshooting page and release history.
+- Open Graph / Twitter metadata uses the GitHub Pages URL.
+- PWA-style responsive website refresh, app installation help and service worker offline shell.
+
+GitHub Pages compatibility:
+- Removed the previous hosting provider configuration, serverless functions, dependencies and old deployment URLs.
+- No server-side API or scheduled function is deployed by GitHub Pages.
+- Dance Reminders were removed in the v1.7.0 website accounts local test. PWA installation is still supported.
+- Reliable push notifications while fully closed require a separately configured push backend. No VAPID secret is included in this repository.
+
+Compatibility statements follow the project owner's report:
+- Legacy Just Dance PC by DIEGUINHODG: fully working / recommended.
+- JD2021 PC by Dreyn: not supported in recent Legacy Sensor releases; older versions need separate testing.
+- Just Dance Liminal: under investigation; compatibility is not yet verified.
+
+Other limitations:
+- GitHub Releases hosting and real SHA-256 hashes are not included because final application archives and release assets must be confirmed first.
+- The desktop app, Kinect binaries and tracking engine were not modified by this website update.

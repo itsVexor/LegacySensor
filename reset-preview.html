@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Legacy Sensor — Repair Local Preview</title>
+<style>body{background:radial-gradient(circle at 20% 5%,#633369,#100a20 75%);color:#fff;display:grid;place-items:center;min-height:100vh;margin:0;font:16px system-ui,sans-serif}main{max-width:540px;margin:18px;padding:34px;background:#261637;border:1px solid #755176;border-radius:22px;box-shadow:0 20px 55px #0006}h1{margin:0 0 15px;font-size:25px}p{line-height:1.6;color:#e4d6ee}button{background:linear-gradient(100deg,#ee62b5,#9958ea);border:0;border-radius:12px;color:#fff;padding:13px 20px;font:700 15px system-ui;cursor:pointer}</style></head>
+<body><main><h1>🌸 Legacy Sensor — local cache repair</h1><p>Remove only obsolete Legacy Sensor PWA caches and service workers from this local preview. Your Firebase login and profile will stay saved.</p><button id="reset" type="button">Clear old preview cache &amp; open website</button><p id="status" role="status"></p></main>
+<script>
+const btn=document.getElementById('reset'),status=document.getElementById('status');
+btn.addEventListener('click',async()=>{
+  if(!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
+    status.textContent='This tool runs only on localhost.';return;
+  }
+  btn.disabled=true;status.textContent='Cleaning old preview cache...';
+  try{
+    if('serviceWorker' in navigator){const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.filter(r=>r.scope.startsWith(location.origin+'/')).map(r=>r.unregister()));}
+    if('caches' in window){const keys=await caches.keys();
+      await Promise.all(keys.filter(k=>k.startsWith('legacy-sensor-')).map(k=>caches.delete(k)));}
+    status.textContent='Old cache removed. Reloading site...';
+    location.replace('./index.html?season=off&fresh=seasonfix2');
+  }catch(e){status.textContent='Could not clear everything: '+e.message+'. You can use Chrome site settings to clear cached data.';btn.disabled=false;}
+});
+</script></body></html>
